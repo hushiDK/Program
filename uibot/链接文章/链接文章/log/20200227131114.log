@@ -1,0 +1,4 @@
+[2020/2/27 13:11:33][ERROR][uibot383a90a4a4352e.task][34] 运行发生错误，流程中止
+错误信息如下：
+uibot383a90a4a4352e.task 第34行：Python调用出错：写入Excel区域失败,写入数据非二维数组或写入目标不存在？
+'str' object has no attribute 'append'

@@ -1,0 +1,4 @@
+[2020/2/28 21:49:00][ERROR][uibot38385c2483da42.task][68] 运行发生错误，流程中止
+错误信息如下：
+uibot38385c2483da42.task 第68行：Python调用出错：ExecuteSQL 异常：
+(1136, "Column count doesn't match value count at row 1")

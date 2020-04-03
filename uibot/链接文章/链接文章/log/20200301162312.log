@@ -1,0 +1,4 @@
+[2020/3/1 16:23:23][ERROR][uibot38385c2483da42.task][83] 运行发生错误，流程中止
+错误信息如下：
+uibot38385c2483da42.task 第83行：Python调用出错：ExecuteSQL 异常：
+(1146, "Table 'test.wechat' doesn't exist")

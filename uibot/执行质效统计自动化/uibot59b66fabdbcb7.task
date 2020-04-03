@@ -1,0 +1,887 @@
+//流程包
+Import uibot3811e3e9a89eb6          //方法包
+Import apistatus                    //状态码
+
+
+// 读取配置文件
+Function readConfig()
+    dim objExcelWorkBook=""
+    dim 基础配置=""
+    objExcelWorkBook = Excel.OpenExcel("E:\\UAide Program\\执行质效统计自动化\\基础配置.xls",true) 
+    
+    基础配置 = Excel.ReadRange(objExcelWorkBook,"账户密码","A2:C3")
+    // TracePrint 基础配置
+    dim dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+
+    Log.Info(dTime&"--读取配置信息--完毕")
+    Excel.CloseExcel(objExcelWorkBook,true)
+    Return 基础配置
+End Function
+
+
+//核对登录法院名称正确
+Function judgelawname()
+    dim 法院
+    #icon("@res:hu051587-vp25-is7a-0u8q-gbqldgcg64al.png")
+    法院 = UiElement.GetValue({"html":{"attrMap":{"id":"fymc","tag":"INPUT"},"index":0,"tagName":"INPUT"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    if 法院<>"临汾市尧都区人民法院"
+        Log.Warn("系统更新，需要重新选择法院")
+        Dialog.Notify("系统更新，需要重新选择法院", "UiBot", "0")
+        #icon("@res:r0rhl7sq-aqqj-bfi6-5k5o-n17usgcqnoit.png")
+        Mouse.Action({"html":{"attrMap":{"parentid":"login_fy","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+        #icon("@res:7gt0qhjj-6qkb-708t-02e5-s8n2ee0nd3r8.png")
+        Mouse.Action({"html":{"attrMap":{"parentid":"mytree","tag":"IMG"},"index":1,"tagName":"IMG"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+        #icon("@res:d26njph5-cb6e-mtbp-hpca-gch5qorltkqe.png")
+        Mouse.Action({"html":{"attrMap":{"css-selector":"body>table>tbody>tr>td>div>div>table>tbody>tr>td>table>tbody>tr>td>table>tbody>tr>td>img","parentid":"mytree","tableCol":"1","tag":"IMG"},"index":10,"tagName":"IMG"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+        #icon("@res:uu0b2koj-d3un-0661-ebub-0rgfpeun4q0e.png")
+        Mouse.Action({"html":{"attrMap":{"aaname":"临汾市尧都区人民法院","parentid":"mytree","tag":"SPAN"},"index":0,"tagName":"SPAN"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+        #icon("@res:u5s4jfdu-ial5-1geh-s1nc-d6gjs60ihm4s.png")
+        Mouse.Action({"html":{"attrMap":{"aaname":"确认","tag":"BUTTON"},"index":0,"tagName":"BUTTON"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    end if 
+end function
+
+
+//执行流程登录
+Function loginFrist(name,pswd,url)
+    dim hWeb,status
+    hWeb= WebBrowser.Create("ie",url,10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"sBrowserPath":"","sStartArgs":""})
+    Delay(1500)
+    //登录api
+    status =apistatus.api(url)
+    log.Info(status)
+    if status=200
+        //窗口最大化
+        #icon("@res:default.png")
+        bRet = UiElement.Exists({"wnd":[{"cls":"IEFrame","title":"人民法院执行案件流程信息管理系统 - Windows Internet Explorer","app":"iexplore"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                
+        if bRet=True
+            #icon("@res:njcju0u7-11dh-91rk-dm3g-e8k597cocd9u.png")
+            Window.Show({"wnd":[{"cls":"IEFrame","title":"人民法院执行案件流程信息管理系统 - Windows Internet Explorer","app":"iexplore"}]},"max")
+        end if
+        //核对使法院名称正确
+        judgelawname()
+        Delay 1500
+        //等到登录元素出现,输入账户、密码，点击登录
+        #icon("@res:e48d3p37-a0hg-t8m6-qoij-ticpl6o5d11d.png")
+        UiElement.Wait({"html":{"attrMap":{"id":"login_submit","tag":"A"},"index":0,"tagName":"A"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",50000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        #icon("@res:70itb7at-3vua-64el-hhbd-tjlgggdphqkd.png")
+        Keyboard.InputText({"html":{"attrMap":{"id":"username","tag":"INPUT"},"index":0,"tagName":"INPUT"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},name,true,10,10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"sKeyModifiers":[],"sSimulate":"message"})
+        #icon("@res:d81l6mvp-1eej-7n42-4j2d-9hot13jkbsos.png")
+        Keyboard.InputText({"html":{"attrMap":{"id":"password","tag":"INPUT"},"index":0,"tagName":"INPUT"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},pswd,true,10,10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"sKeyModifiers":[],"sSimulate":"message"})
+        #icon("@res:h9r9rbnq-l6qn-2e16-53t9-jjne7jekblm1.png")
+        Mouse.Action({"html":{"attrMap":{"id":"login_submit","tag":"A"},"index":0,"tagName":"A"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",20000,{"bContinueOnError":false,"iDelayAfter":3000,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+        Delay(1000)
+        //流程主界面api
+        // LCMainurl='http://132.0.26.2:8011/zxxt/new_portal/portal.jsp'
+        dim LCMainUrl
+        LCMainUrl = WebBrowser.GetURL(hWeb,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        // TracePrint LCMainUrl
+        // File.Append("C:\\Users\\tpwy\\Desktop\\汇总.txt","流程主界面---"&LCMainUrl,"gbk")
+        status =apistatus.api(LCMainurl)
+        log.Info(status)
+        if status=200
+            //判断是否有弹窗页面存在
+            dim bRet
+            bRet = UiElement.Exists({"html":{"attrMap":{"css-selector":"body>div>table>tbody>tr>td","parentid":"ext-gen3","tableCol":"2","tag":"TD"},"index":1,"tagName":"TD"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+            If bRet=true
+                // 判断关闭叉叉存在不
+                #icon("@res:mftfddvd-bgei-4fbn-in5f-g98l6opesvv2.png")
+                bRet = UiElement.Exists({"html":{"attrMap":{"css-selector":"body>div>table>tbody>tr>td>div","parentid":"ext-gen3","tag":"DIV"},"index":2,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                If bRet=true
+                    #icon("@res:c8ss5oig-3cs2-4gng-of9u-mg2coeigulh2.png")
+                    Mouse.Action({"html":{"attrMap":{"css-selector":"body>div>table>tbody>tr>td>div","parentid":"ext-gen3","tag":"DIV"},"index":2,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+                End If
+            End If
+            //等待成功登陆后的【常用功能】出现
+            #icon("@res:h5cdh0b1-1d8e-unp6-o7f4-ptp7s07r8u2k.png")
+            UiElement.Wait({"html":{"attrMap":{"aaname":"常用功能","parentid":"leftDiv","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",50000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+            
+            dim dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+            Log.Info(dTime&"--执行流程--登录成功")
+            Return hWeb
+        else
+            Log.Warn("--执行流程--系统维护中,网页状态码----"&status)
+            Return false
+        end if
+    else
+        Log.Warn("--执行流程--系统维护中,网页状态码----"&status)
+        Return false
+    end if
+End Function
+
+
+//案件收结案
+Function AnJianSJ(hWeb,ip)
+    //移动到业务查询、执行统计、本院收结月度统计、分类目标案件类型点击之
+    #icon("@res:ss6en16c-bivc-2frn-oq8b-p376itcop8dn.png")
+    Mouse.Hover({"html":{"attrMap":{"id":"14","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:3vcd6fnn-0sq5-22cg-flnq-ckk3d4n8t5ft.png")
+    Mouse.Action({"html":{"attrMap":{"id":"14","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    Delay(50)
+    #icon("@res:75cr532u-mevh-t6ob-fhl4-40b03b0qvdre.png")
+    Mouse.Hover({"html":{"attrMap":{"aaname":"执行统计","parentid":"1101","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:7sjv0ihf-kdr6-262c-sdp7-o05jt8o14b6v.png")
+    Mouse.Action({"html":{"attrMap":{"aaname":"执行统计","parentid":"1101","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    Delay(50)
+    #icon("@res:eq8tr1h7-741e-ug89-kjkq-so6ti6majkat.png")
+    Mouse.Hover({"html":{"attrMap":{"aaname":"本院收结月度统计","parentid":"106510","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:062brmpa-tqcc-96ae-fco8-qdmvqrpgbdsl.png")
+    Mouse.Action({"html":{"attrMap":{"aaname":"本院收结月度统计","parentid":"106510","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    Delay(50)
+    #icon("@res:umfr5nk3-dqpo-n0s5-cf3a-0nn9g82h79da.png")
+    Mouse.Hover({"html":{"attrMap":{"name":"tjfs","tag":"INPUT"},"index":1,"tagName":"INPUT"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:p5bfthak-op7c-vvdo-q4kd-fth3g72kdcth.png")
+    Mouse.Action({"html":{"attrMap":{"name":"tjfs","tag":"INPUT"},"index":1,"tagName":"INPUT"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    Delay(50)
+
+    //时间19年
+    // #icon("@res:rglnos5v-p8hi-likc-l6uf-n78e915ke96b.png")
+    // Mouse.Action({"html":{"attrMap":{"id":"tjny","tag":"INPUT"},"index":0,"tagName":"INPUT"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    // #icon("@res:ktmmjkf8-4gmu-5g2f-la73-emlgrocr3m25.png")
+    // Mouse.Action({"html":{"attrMap":{"css-selector":"body>div>div>table>tbody>tr>td","tableRow":"3","tag":"TD"},"index":1,"tagName":"TD"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    // #icon("@res:iiq3p6j0-ka0c-vdl8-okar-d56vvotr933a.png")
+    // UiElement.SetValue({"html":{"attrMap":{"id":"tjny","tag":"INPUT"},"index":0,"tagName":"INPUT"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"2019-12",{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+
+
+
+    #icon("@res:9sa0rdsg-3snj-d34e-r5kj-4koe1e8kp5c2.png")
+    Mouse.Hover({"html":{"attrMap":{"parentid":"btnTj","tag":"INPUT","type":"button"},"index":0,"tagName":"INPUT"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:ia7rq6rs-e3tn-09tp-s86p-3m80rt38l4bq.png")
+    Mouse.Action({"html":{"attrMap":{"parentid":"btnTj","tag":"INPUT","type":"button"},"index":0,"tagName":"INPUT"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    Delay(2000)
+
+    //判断执行局\院领导存在与否，对应旧存新收数据存在与否,返回一个数组
+    dim arr 
+    arr = judge()
+    
+    if arr[0]="执行局" and arr[1]<>" "
+        #icon("@res:rqka4pue-t1oa-02ro-7m55-gck8m3j92eod.png")
+        Mouse.Action({"html":{"attrMap":{"parentid":"qnca_14100101_bm","tag":"SPAN"},"index":0,"tagName":"SPAN"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+        #icon("@res:s1vrl99h-5odk-a3tq-1boh-gnn82cho63i0.png")
+        UiElement.Wait({"html":{"attrMap":{"parentid":"ajList","tableCol":"1","tag":"TD"},"index":2,"tagName":"TD"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",50000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        //详情页api
+        // dim url='http://132.0.26.2:8011/zxxt/webapp/court/ajgl/tjfx/sjctj/sjctj_table_getAj.jsp?tjfs=bm&tjny=2019-12&dm=14100101&lx=bm&type=qnca'
+        //执行局旧存api
+        dim ZxjJcUrl,status
+        ZxjJcurl = WebBrowser.GetURL(hWeb,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        // TracePrint ZxjJcurl
+        // File.Append("C:\\Users\\tpwy\\Desktop\\汇总.txt","执行局旧存---"&ZxjJcUrl,"gbk")
+        status =apistatus.api(ZxjJcUrl)
+        Log.Info(status)
+        if status=200
+            Log.Info("进入执行局旧存页面，开始抓取数据")
+            Dialog.Notify("进入执行局旧存页面，开始抓取数据", "UiBot", "0")
+            dim zxjlastyear
+            //抓取数据
+            zxjlastyear=getAnJianSJdata()
+            Log.Info("执行局旧存数据--抓取成功")
+            Dialog.Notify("执行局旧存数据--抓取成功", "UiBot", "0")
+            //整理传递数据
+            uibot3811e3e9a89eb6.postAnJianSJData(zxjlastyear,0,ip)
+            //员额法官
+            uibot3811e3e9a89eb6.postAnJianSJLawyername(zxjlastyear,ip)
+            Log.Info("处理并传递--执行局旧存数据--成功")
+            Dialog.Notify("处理并传递--执行局旧存数据--成功", "UiBot", "0")
+        Else
+            dim dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+            Log.Warn(dTime&"执行流程--系统维护中,网页状态码--"&status)
+            Return false
+        End If
+    end if 
+    if arr[0]="执行局" and arr[2]<>" "
+        #icon("@res:2amptl5q-rskt-inu2-ao8s-d0ja1h7l47dk.png")
+        Mouse.Action({"html":{"attrMap":{"parentid":"dnsa_14100101_bm","tag":"SPAN"},"index":0,"tagName":"SPAN"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+        #icon("@res:s1vrl99h-5odk-a3tq-1boh-gnn82cho63i0.png")
+        UiElement.Wait({"html":{"attrMap":{"parentid":"ajList","tableCol":"1","tag":"TD"},"index":2,"tagName":"TD"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",50000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        // url='http://132.0.26.2:8011/zxxt/webapp/court/ajgl/tjfx/sjctj/sjctj_table_getAj.jsp?tjfs=bm&tjny=2019-12&dm=14100101&lx=bm&type=qnca'
+        //执行局新收api
+        dim ZxjXsUrl
+        ZxjXsurl = WebBrowser.GetURL(hWeb,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        // TracePrint ZxjXsurl
+        // File.Append("C:\\Users\\tpwy\\Desktop\\汇总.txt","执行局新收---"&ZxjXsurl,"gbk")
+        status =apistatus.api(ZxjXsUrl)
+        // TracePrint status
+        Log.Info(status)
+        if status=200
+            Log.Info("进入--执行局新收--页面，开始抓取数据")
+            Dialog.Notify("进入--执行局新收--页面，开始抓取数据", "UiBot", "0")
+            dim zxjnowyear
+            //抓取数据
+            zxjnowyear = getAnJianSJdata()
+            Log.Info("抓取--执行局新收数据--成功")
+            Dialog.Notify("抓取--执行局新收数据--成功", "UiBot", "0")
+            //整理传递数据
+            uibot3811e3e9a89eb6.postAnJianSJData(zxjnowyear,1,ip)
+            //员额法官
+            uibot3811e3e9a89eb6.postAnJianSJLawyername(zxjlastyear,ip)
+            Log.Info("处理并传递--执行局新收数据--成功")
+            Dialog.Notify("处理并传递--执行局新收数据--成功", "UiBot", "0")
+        else
+            dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+            Log.Warn(dTime&"--执行流程--系统维护中,网页状态码--"&status)
+            Return false
+        end if
+    end if 
+    if arr[3]="院领导" and arr[4]<>" "
+
+        #icon("@res:e9i0rs4d-0963-hk20-agum-onoqbcce27en.png")
+        Mouse.Action({"html":{"attrMap":{"id":"qnca_14100103_bm","tag":"TD"},"index":0,"tagName":"TD"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+        #icon("@res:s1vrl99h-5odk-a3tq-1boh-gnn82cho63i0.png")
+        UiElement.Wait({"html":{"attrMap":{"parentid":"ajList","tableCol":"1","tag":"TD"},"index":2,"tagName":"TD"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",50000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        // url='http://132.0.26.2:8011/zxxt/webapp/court/ajgl/tjfx/sjctj/sjctj_table_getAj.jsp?tjfs=bm&tjny=2019-12&dm=14100101&lx=bm&type=qnca'
+        //院领导旧存api
+        dim YldJcUrl
+        YldJcUrl = WebBrowser.GetURL(hWeb,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        TracePrint YldJcUrl
+        // File.Append("C:\\Users\\tpwy\\Desktop\\汇总.txt","院领导旧存---"&YldJcUrl,"gbk")
+        status =apistatus.api(YldJcUrl)
+        log.Info(status)
+        if status=200
+            Log.Info("进入--院领导旧存--页面，开始抓取数据")
+            Dialog.Notify("进入--院领导旧存--页面，开始抓取数据", "UiBot", "0")
+            dim yldlastyear
+            //抓取数据
+            yldlastyear = getAnJianSJdata()
+            Log.Info("抓取--院领导旧存数据--成功")
+            Dialog.Notify("抓取--院领导旧存数据--成功", "UiBot", "0")
+            //整理传递数据
+            uibot3811e3e9a89eb6.postAnJianSJData(yldlastyear,0,ip)
+            //员额法官
+            uibot3811e3e9a89eb6.postAnJianSJLawyername(zxjlastyear,ip)
+            Log.Info("处理并传递--院领导旧存数据--成功")
+            Dialog.Notify("处理并传递--院领导旧存数据--成功", "UiBot", "0")
+        else
+            dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+            Log.Warn(dTime&"--执行流程--系统维护中,网页状态码--"&status)
+            Return false
+        end if
+    end if 
+    if arr[3]="院领导" and arr[5]<>" "
+        #icon("@res:df3q9qe4-ukcu-u89o-hn6v-bps876iemrqf.png")
+        Mouse.Action({"html":{"attrMap":{"id":"dnsa_14100103_bm","tag":"TD"},"index":0,"tagName":"TD"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+        #icon("@res:s1vrl99h-5odk-a3tq-1boh-gnn82cho63i0.png")
+        UiElement.Wait({"html":{"attrMap":{"parentid":"ajList","tableCol":"1","tag":"TD"},"index":2,"tagName":"TD"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",50000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        // url='http://132.0.26.2:8011/zxxt/webapp/court/ajgl/tjfx/sjctj/sjctj_table_getAj.jsp?tjfs=bm&tjny=2019-12&dm=14100101&lx=bm&type=qnca'
+        // url='http://132.0.26.2:8014/zxxt/webapp/court/ajgl/tjfx/sjctj/sjctj_table_getAj.jsp?tjfs=bm&tjny=2020-01&dm=14100101&lx=bm&type=qnca'
+        //院领导新收api
+        dim YldXsUrl
+        YldXsUrl = WebBrowser.GetURL(hWeb,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        // TracePrint YldXsUrl
+        // File.Append("C:\\Users\\tpwy\\Desktop\\汇总.txt","院领导新收---"&YldXsUrl,"gbk")
+        status =apistatus.api(YldXsUrl)
+        log.Info(status)
+        if status=200
+            Log.Info("进入--院领导新收--页面，开始抓取数据")
+            TracePrint "进入院领导新收--页面，开始抓取数据"
+            Dialog.Notify("进入院领导新收--页面，开始抓取数据", "UiBot", "0")
+            dim yldnowyear
+            //抓取数据
+            yldnowyear = getAnJianSJdata()
+            Log.Info("抓取--院领导新收数据--成功")
+            Dialog.Notify("抓取--院领导新收数据--成功", "UiBot", "0")
+            //整理传递数据
+            uibot3811e3e9a89eb6.postAnJianSJData(yldnowyear,1,ip)
+            //员额法官
+            uibot3811e3e9a89eb6.postAnJianSJLawyername(zxjlastyear,ip)
+            Log.Info("处理并传递--院领导新收数据--成功")
+            Dialog.Notify("处理并传递--院领导新收数据--成功", "UiBot", "0")
+        else
+            dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+            Log.Warn(dTime&"--执行流程--系统维护中,网页状态码--"&status)
+            Return false
+        end if
+    end if 
+    //回归初始页面
+    #icon("@res:jbaqghp7-9oi3-8gd0-stn8-algnii5trk7i.png")
+    Mouse.Action({"html":{"attrMap":{"css-selector":"body>table>tbody>tr>td>table>tbody>tr>td>div>div>div>div>div>div>div","parentid":"tabTitle_106510","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:92ee6e0c-rs63-c1b8-fjrl-u7d0tjkona6u.png")
+    Mouse.Action({"html":{"attrMap":{"aaname":"执行统计","parentid":"1101","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})           
+    // Log.Info("传递案件收结案数据成功")
+    Dialog.Notify("传递案件收结案数据成功", "UiBot", "0")
+End Function
+
+
+//判断执行局\院领导存在与否，对应旧存新收数据存在与否，返回一个数组
+Function judge()
+    dim arrElement
+    #icon("@res:g992q3jg-s823-8099-jjb4-9s4qv1l2h63u.png")
+    arrElement = UiElement.GetChildren({"html":{"attrMap":{"id":"tjtab","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    #icon("@res:g992q3jg-s823-8099-jjb4-9s4qv1l2h63u.png")
+    arrElement = UiElement.GetChildren(arrElement[0],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    #icon("@res:g992q3jg-s823-8099-jjb4-9s4qv1l2h63u.png")
+    arrElement = UiElement.GetChildren(arrElement[0],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+
+    dim 执行局,执行局标题,执行局旧存,执行局当年新收,院领导,院领导标题,院领导旧存,院领导当年新收
+    dim arr=[]
+    #icon("@res:g992q3jg-s823-8099-jjb4-9s4qv1l2h63u.png")
+    执行局 = UiElement.GetChildren(arrElement[6],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    #icon("@res:default.png")
+    执行局标题 = UiElement.GetValue(执行局[0],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    #icon("@res:default.png")
+    执行局旧存 = UiElement.GetValue(执行局[7],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    #icon("@res:default.png")
+    执行局当年新收 = UiElement.GetValue(执行局[8],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    #icon("@res:g992q3jg-s823-8099-jjb4-9s4qv1l2h63u.png")
+    院领导 = UiElement.GetChildren(arrElement[7],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    #icon("@res:default.png")
+    院领导标题 = UiElement.GetValue(院领导[0],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    #icon("@res:default.png")
+    院领导旧存 = UiElement.GetValue(院领导[7],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    #icon("@res:default.png")
+    院领导当年新收 = UiElement.GetValue(院领导[8],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+
+    push(arr,执行局标题)
+    push(arr,执行局旧存)
+    push(arr,执行局当年新收)
+    push(arr,院领导标题)
+    push(arr,院领导旧存)
+    push(arr,院领导当年新收)
+    // TracePrint arr
+    Return arr
+End Function
+
+
+//抓取案件收结数据过程
+Function getAnJianSJdata()
+    dim pages,sum=[],detail=[]
+    #icon("@res:gb3jjli7-f6lr-meg6-cp9l-pfp1d9d5kk06.png")
+    pages= UiElement.GetValue({"html":{"attrMap":{"id":"PageCount","tag":"INPUT"},"index":0,"tagName":"INPUT"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    Log.Info("最大页数--"&pages&"-页")
+
+    for page=1 to CInt(pages)
+        Log.Info("进入第-"&page&"-页")
+        Mouse.Move(500, 500, false,{"iDelayAfter":300,"iDelayBefore":200})
+        #icon("@res:m8kh6c2e-fpjm-bqk8-l89b-err5ql4pq1l7.png")
+        UiElement.Wait({"html":{"attrMap":{"parentid":"ajList","tableCol":"3","tag":"TD"},"index":2,"tagName":"TD"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",50000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        Mouse.Click("left", "click", [],{"iDelayAfter":300,"iDelayBefore":200})
+        Mouse.Wheel(10,"down", [],{"iDelayAfter":300,"iDelayBefore":200})
+        // TracePrint page
+        dim arrayData
+        Log.Info("抓取数据")
+        arrayData = UiElement.DataScrap({"html":{"attrMap":{"parentid":"ajList","tag":"TABLE"},"index":2,"tagName":"TABLE"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"Columns":[],"ExtractTable":1},{"objNextLinkElement":{"html":{"attrMap":{"id":"right","tag":"IMG"},"index":0,"tagName":"IMG"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"iMaxNumberOfPage":1,"iMaxNumberOfResult":-1,"iDelayBetweenMS":1000,"bContinueOnError":false})
+        // TracePrint arrayData
+        for k=1 to UBound(arrayData)
+            // TracePrint arrayData[k]
+            push(detail,arrayData[k][2])    //案号
+            push(detail,arrayData[k][3])    //案件代字
+            push(detail,arrayData[k][4])    //状态
+            push(detail,arrayData[k][8])    //承办人
+            push(detail,arrayData[k][12])    //结案日期
+            push(detail,arrayData[k][17])    //结案方式
+            push(sum,detail)
+            detail=[]
+        next
+        if page<CInt(pages)
+            #icon("@res:9gdt4qp7-8osp-qjgq-oamg-9toq4p0t1a65.png")
+            Mouse.Action({"html":{"attrMap":{"id":"right","tag":"IMG"},"index":0,"tagName":"IMG"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"uia"})    
+        end if
+    next
+    #icon("@res:99m7ltoo-8bas-f9na-3qfv-ekgv2t27duf8.png")
+    Mouse.Action({"wnd":[{"app":"iexplore","cls":"IEFrame","title":"收结存统计_查看案件信息 - Windows Internet Explorer"},{"cls":"WorkerW","title":"导航栏","aaname":"导航栏"},{"cls":"ReBarWindow32"},{"cls":"TabBandClass"},{"cls":"DirectUIHWND"}],"ctrl":[{"role":"ROLE_SYSTEM_PAGETABLIST","name":"选项卡行"},{"role":"ROLE_SYSTEM_PAGETAB","name":"收结存统计_查看案件信息"},{"role":"ROLE_SYSTEM_PUSHBUTTON","name":"关闭选项卡(Ctrl+W)"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    Log.Info("关闭子页面，")
+    Return sum
+End Function
+
+
+//获取月度统计数据
+Function getMonthData(yearmonth,ip,Monthcache)
+    //移动到业务查询、执行统计、本院收结月度统计、分类目标案件类型点击之
+    #icon("@res:ss6en16c-bivc-2frn-oq8b-p376itcop8dn.png")
+    Mouse.Hover({"html":{"attrMap":{"id":"14","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:3vcd6fnn-0sq5-22cg-flnq-ckk3d4n8t5ft.png")
+    Mouse.Action({"html":{"attrMap":{"id":"14","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    Delay(50)
+    #icon("@res:75cr532u-mevh-t6ob-fhl4-40b03b0qvdre.png")
+    Mouse.Hover({"html":{"attrMap":{"aaname":"执行统计","parentid":"1101","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:7sjv0ihf-kdr6-262c-sdp7-o05jt8o14b6v.png")
+    Mouse.Action({"html":{"attrMap":{"aaname":"执行统计","parentid":"1101","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    Delay(50)
+    #icon("@res:eq8tr1h7-741e-ug89-kjkq-so6ti6majkat.png")
+    Mouse.Hover({"html":{"attrMap":{"aaname":"本院收结月度统计","parentid":"106510","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:062brmpa-tqcc-96ae-fco8-qdmvqrpgbdsl.png")
+    Mouse.Action({"html":{"attrMap":{"aaname":"本院收结月度统计","parentid":"106510","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    Delay(50)
+    #icon("@res:coeogr2d-751o-7e36-8qe4-o8m6r1ojk5a2.png")
+    Mouse.Hover({"html":{"attrMap":{"name":"tjfs","tag":"INPUT"},"index":2,"tagName":"INPUT"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:ghtd4uul-lt6b-7am6-0b8u-bu975t5db191.png")
+    Mouse.Action({"html":{"attrMap":{"name":"tjfs","tag":"INPUT"},"index":2,"tagName":"INPUT"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+
+    // 移动到统计，点击之
+    #icon("@res:jdlttfm8-a7d4-72n3-0ri2-u06l2t7rikit.png")
+    Mouse.Hover({"html":{"attrMap":{"parentid":"btnTj","tableCol":"2","tag":"TD"},"index":0,"tagName":"TD"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:tk6578nr-vkvp-j6ve-vbll-s1vk6vishm8s.png")
+    Mouse.Action({"html":{"attrMap":{"parentid":"btnTj","tag":"INPUT","type":"button"},"index":0,"tagName":"INPUT"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    Delay(1850)
+    //抓取数据，要的是表数据的表头
+    dim dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+    Log.Info(dTime&"抓取-"&yearmonth&"-月度统计表头--数据")
+    Dialog.Notify("抓取"&yearmonth&"-月度统计表头--数据", "UiBot", "0")
+    dim MonthHeadarr
+    MonthHeadarr  = UiElement.DataScrap({"html":{"attrMap":{"id":"titletable","tag":"TABLE"},"index":0,"tagName":"TABLE"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"Columns":[],"ExtractTable":1},{"objNextLinkElement":"","iMaxNumberOfPage":5,"iMaxNumberOfResult":-1,"iDelayBetweenMS":1000,"bContinueOnError":false})
+    //截取数组中特定的有效数据（表头不要，表尾部不要）
+    MonthHeadarr=uibot3811e3e9a89eb6.SpliceMonth(MonthHeadarr)
+    Log.Info("抓取-"&yearmonth&"-月度表头数据--成功")
+    
+    //获取月度统计下多少种案件类型，点击打开下拉框
+    clickMonth()
+    Delay(2000)
+    //抓取数据 要的是下拉表数据
+    // Log.Info("抓取-"&yearmonth&"-月度下拉统计表")
+    Dialog.Notify("开始抓取"&yearmonth&"-月度下拉统计表", "UiBot", "0")
+    dim MonthDetailarr
+    dim Detailarr
+    MonthDetailarr = UiElement.DataScrap({"html":{"attrMap":{"id":"titletable","tag":"TABLE"},"index":0,"tagName":"TABLE"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"Columns":[],"ExtractTable":1},{"objNextLinkElement":"","iMaxNumberOfPage":5,"iMaxNumberOfResult":-1,"iDelayBetweenMS":1000,"bContinueOnError":false})
+    
+    //截取数组中特定的有效数据（表头不要，表尾部不要）
+    Detailarr=uibot3811e3e9a89eb6.SpliceMonth(MonthDetailarr)
+    Log.Info("抓取-"&yearmonth&"-月度下拉数据--成功")
+
+    dim act
+    //比较表头数据和详细数据，返回出固定格式的数据，表头生成一级表头，下拉表生成二级表头
+    act=uibot3811e3e9a89eb6.getActData(MonthHeadarr,Detailarr)
+    For Each v In act
+        //在每个v尾部加最后一个元素
+        v=push(v,MonthDetailarr[UBound(MonthDetailarr)][0])        
+    Next
+    // TracePrint act
+
+    //请求数据库，若返回值为1，继续下一步操作
+    if iswrite(Monthcache)=1
+            //整理传递数据
+        uibot3811e3e9a89eb6.PostMonthData(act,ip)
+        dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+        // Log.Info(dTime&"处理并传递-"&yearmonth&"-月度全部有效数据成功")
+        Dialog.Notify("处理传递"&yearmonth&"月度统计表成功", "UiBot", "0")   
+    Else 
+        Log.Info("请求数据库失败，执行下一步")
+    end if 
+End Function
+
+
+//获取月度统计下多少种案件类型，点击之
+Function clickMonth()
+    dim arrElement
+    #icon("@res:g992q3jg-s823-8099-jjb4-9s4qv1l2h63u.png")
+    arrElement = UiElement.GetChildren({"html":{"attrMap":{"id":"tjtab","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    #icon("@res:g992q3jg-s823-8099-jjb4-9s4qv1l2h63u.png")
+    arrElement = UiElement.GetChildren(arrElement[0],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    #icon("@res:g992q3jg-s823-8099-jjb4-9s4qv1l2h63u.png")
+    arrElement = UiElement.GetChildren(arrElement[0],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    for v=6 to UBound(arrElement)-2 step 1
+        dim x
+        x=UiElement.GetChildren(arrElement[v],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        #icon("@res:default.png")
+        Mouse.Action(x[0],"left","dbclick",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":-42,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+        Delay(250)
+    next
+End Function
+
+
+// 执行指挥登录
+Function loginSecond(name,pswd,url)
+    dim hWeb,bRet,dTime
+    hWeb= WebBrowser.Create("ie",url,10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"sBrowserPath":"","sStartArgs":""})
+    Delay(1500)
+    //登录api
+    dim status
+    status =apistatus.api(url)
+    log.Info(status)
+    if status=200
+        //窗口最大化
+        #icon("@res:default.png")
+        bRet = UiElement.Exists({"wnd":[{"cls":"IEFrame","title":"最高人民法院执行统一认证系统 - Windows Internet Explorer","app":"iexplore"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        if bRet=True
+            #icon("@res:njcju0u7-11dh-91rk-dm3g-e8k597cocd9u.png")
+            Window.Show({"wnd":[{"cls":"IEFrame","title":"最高人民法院执行统一认证系统 - Windows Internet Explorer","app":"iexplore"}]},"max")
+        end if
+        //等待登录元素出现,目标中输入账户、密码
+        #icon("@res:fjsnc0il-79ma-qhld-qdkp-qe3519uiuqjr.png")
+        UiElement.Wait({"html":{"attrMap":{"tag":"A"},"index":0,"tagName":"A"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",50000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        #icon("@res:q83l1mh                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                t-mti5-1681-ot9v-2lufb946bf4k.png")
+        Keyboard.InputText({"html":{"attrMap":{"id":"username1","tag":"INPUT"},"index":0,"tagName":"INPUT"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},name,true,10,10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"sKeyModifiers":[],"sSimulate":"message"})
+        #icon("@res:kqd8bpg6-ufct-s6gu-8fij-bjvc7omkcog4.png")
+        Keyboard.InputText({"html":{"attrMap":{"id":"password1","tag":"INPUT"},"index":0,"tagName":"INPUT"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},pswd,true,10,10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"sKeyModifiers":[],"sSimulate":"message"})
+        //回车登陆
+        Keyboard.Press("Enter", "press", [],{"iDelayAfter":300,"iDelayBefore":200,"sSimulate":"simulate"})
+        Delay(1500)
+
+        //执行指挥主界面api
+        // dim ZhainUrl
+        // ZhMainUrl='http://192.1.32.8:8088/glpt/form/a88b5ec820a50c3c17c936f236bb8e12/insert'
+        dim ZhMainUrl
+        ZhMainUrl = WebBrowser.GetURL(hWeb,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        // TracePrint ZhMainUrl
+        // File.Append("C:\\Users\\tpwy\\Desktop\\汇总.txt","执行指挥主界面---"&ZhMainUrl,"gbk")
+        status =apistatus.api(ZhMainurl)
+        log.Info(status)
+        if status=200
+            // 将鼠标移动到质效考核应该出现的坐标上
+            Mouse.Move(800, 456, false,{"iDelayAfter":300,"iDelayBefore":200})
+            //等待质效考核元素出现，出现则说明登录成功
+            #icon("@res:default.png")
+            UiElement.Wait({"html":{"attrMap":{"id":"jqHtmlArea51d76","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",50000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+            // Log.Info("质效考核元素出现")
+            //弹窗提示
+            Dialog.Notify("--执行指挥平台--登录成功", "UiBot", "0")
+            dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+            Log.Info(dTime&"--执行指挥平台--登录成功")
+            Return hWeb
+        else
+            dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+            Log.Info(dTime&"--指挥平台--系统维护中,网页状态码--"&status)
+            Return false
+        end if
+    else 
+        dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+        Log.Info(dTime&"--指挥平台--系统维护中,网页状态码--"&status)
+        Return false
+    end if 
+End Function
+
+//进入核心指标
+function EnterHxzb()
+    #icon("@res:ec8b9q6c-nus2-mhib-tcqa-m6jrhl3b0gbo.png")
+    UiElement.Wait({"html":{"attrMap":{"parentid":"jqHtmlAreaf1d49","tag":"SPAN"},"index":0,"tagName":"SPAN"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",50000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    //点击进入核心指标
+    #icon("@res:jf12esm0-u3uj-fq30-qo1v-06tlgboasbt3.png")
+    Mouse.Action({"html":{"attrMap":{"parentid":"jqHtmlAreaf1d49","tag":"SPAN"},"index":0,"tagName":"SPAN"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:0ll38dr5-ijqh-67me-jhti-b4fo7p5vtmai.png")
+    UiElement.Wait({"html":{"attrMap":{"id":"WidgetParamButton98","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",50000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    Log.Info("进入核心指标页面")
+
+end function
+
+//抓取核心指标效率数据
+Function getHxzbTitle(hWeb,ip)
+    //3+1核心指标api
+    // HxzbUrl='http://192.1.43.39:8080/jjzxn/form/ajzxfxHome/insert'
+    dim HxzbUrl,status,dTime
+    HxzbUrl = WebBrowser.GetURL(hWeb,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    // TracePrint HxzbUrl
+    // File.Append("C:\\Users\\tpwy\\Desktop\\汇总.txt","3+1核心指标---"&HxzbUrl,"gbk")
+    status =apistatus.api(Hxzburl)
+    log.Info(status)
+    if status=200
+        dim arrElement总 = ""
+        //等待目标数值元素出现(唯一有值)
+        #icon("@res:f7i4dsv1-juo2-1bp2-lubb-840mvdn0fhre.png")
+        UiElement.Wait({"html":{"attrMap":{"parentid":"jqLinkf2d76","tag":"SPAN"},"index":0,"tagName":"SPAN"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",50000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        //获取总目标子元素
+        #icon("@res:o3rvj3mm-qnvv-0tt6-ep53-otnae753k1rv.png")
+        arrElement总 = UiElement.GetChildren({"html":{"attrMap":{"id":"jqContainer7ef4e","tag":"DIV"},"index":1,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        dim act=[]
+        dim x
+        for k=0 to UBound(arrElement总)-1
+            x=UiElement.GetValue(arrElement总[k],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+            x = Split(x," ")
+            // TracePrint x
+            push(act,x[1])
+        next
+        // TracePrint act
+        Log.Info("抓取--核心指标--四大效率指标--成功")
+        //获取核心指标页面数据
+        getHxzbData(act,ip)
+        #icon("@res:nmdo49ag-52uf-7dmf-vuu4-gqemia324ct9.png")
+        Mouse.Action({"wnd":[{"app":"iexplore","cls":"IEFrame","title":"解决执行难工作目标完成情况 - Windows Internet Explorer"},{"cls":"WorkerW","title":"导航栏","aaname":"导航栏"},{"cls":"ReBarWindow32"},{"cls":"TabBandClass"},{"cls":"DirectUIHWND"}],"ctrl":[{"role":"ROLE_SYSTEM_PAGETABLIST","name":"选项卡行"},{"role":"ROLE_SYSTEM_PAGETAB","name":"解决执行难工作目标完成情况"},{"role":"ROLE_SYSTEM_PUSHBUTTON","name":"关闭选项卡(Ctrl+W)"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":500,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    else 
+        dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+        Log.Warn(dTime&"--指挥平台--系统维护中,网页状态码--"&status)
+        Return false
+    end if 
+End Function
+
+
+//获取核心指标页面数据
+Function getHxzbData(act,ip)
+    // dim ip="http://132.40.22.6"
+    dim HxzbapiData = ip&"/index.php/implement/addfour"
+    //获取统计期元素
+    dim arrElement = ""
+    #icon("@res:343tas4b-7rta-tdd1-btch-256obapjjkb0.png")
+    arrElement = UiElement.GetChildren({"html":{"attrMap":{"id":"jqHorizontalBoxcb36d_div","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    #icon("@res:343tas4b-7rta-tdd1-btch-256obapjjkb0.png")
+    arrElement = UiElement.GetChildren(arrElement[0],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    #icon("@res:343tas4b-7rta-tdd1-btch-256obapjjkb0.png")
+    arrElement = UiElement.GetChildren(arrElement[0],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    #icon("@res:343tas4b-7rta-tdd1-btch-256obapjjkb0.png")
+    arrElement = UiElement.GetChildren(arrElement[0],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    dim sRet,arrayData,date
+
+    //循环点击非即时的年份
+    for k=2 to UBound(arrElement)-1
+        #icon("@res:default.png")
+        Mouse.Action(arrElement[k],"left","dbclick",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+        date = UiElement.GetValue(arrElement[k],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        Delay(3000)
+        #icon("@res:pklvi4ig-gioa-5sd6-hl5c-m11ldti5gljc.png")
+        // 等待数据页面某元素出现
+        UiElement.Wait({"html":{"attrMap":{"id":"GRID2.B5","tag":"TD"},"index":0,"tagName":"TD"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",50000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        #icon("@res:pklvi4ig-gioa-5sd6-hl5c-m11ldti5gljc.png")
+        // 获取同上某元素文本，当文本不为空时，抓取数据
+        sRet = UiElement.GetValue({"html":{"attrMap":{"id":"GRID2.B5","tag":"TD"},"index":0,"tagName":"TD"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        if sRet<>" " or sRet<>""
+            #icon("@res:mbflabr7-5otg-s6vq-ij34-3i090f6hev3b.png")
+            Mouse.Action({"html":{"attrMap":{"id":"GRID2.E5","tag":"TD"},"index":0,"tagName":"TD"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+            Mouse.Wheel(10,"down", [],{"iDelayAfter":300,"iDelayBefore":200})            
+            Log.Info("开始抓取--"&date&"--3+1核心指标数据")
+            arrayData = UiElement.DataScrap({"html":{"attrMap":{"name":"GRID2","tag":"TABLE"},"index":0,"tagName":"TABLE"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"Columns":[],"ExtractTable":1},{"objNextLinkElement":"","iMaxNumberOfPage":5,"iMaxNumberOfResult":-1,"iDelayBetweenMS":1000,"bContinueOnError":false})
+            uibot3811e3e9a89eb6.PostHXZBData(arrayData,act,date,HxzbapiData)
+            Log.Info("处理并传递--"&date&"--3+1核心指标数据--成功")
+        end if
+    next
+
+    dim x=[1,UBound(arrElement)]
+    For Each v In x
+        #icon("@res:default.png")
+        Mouse.Action(arrElement[v],"left","dbclick",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+        date = UiElement.GetValue(arrElement[v],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        Delay(3000)
+        //等待数据页面某元素出现
+        #icon("@res:pklvi4ig-gioa-5sd6-hl5c-m11ldti5gljc.png")
+        UiElement.Wait({"html":{"attrMap":{"id":"GRID2.B5","tag":"TD"},"index":0,"tagName":"TD"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",50000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        //获取同上某元素文本，当文本不为空时，抓取数据
+        #icon("@res:pklvi4ig-gioa-5sd6-hl5c-m11ldti5gljc.png")
+        sRet = UiElement.GetValue({"html":{"attrMap":{"id":"GRID2.B5","tag":"TD"},"index":0,"tagName":"TD"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        if sRet<>" " or sRet<>""
+            #icon("@res:mbflabr7-5otg-s6vq-ij34-3i090f6hev3b.png")
+            Mouse.Action({"html":{"attrMap":{"id":"GRID2.E5","tag":"TD"},"index":0,"tagName":"TD"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+            Mouse.Wheel(25,"down", [],{"iDelayAfter":300,"iDelayBefore":200})            
+            Log.Info("抓取3+1核心指标页面数据")
+            arrayData = UiElement.DataScrap({"html":{"attrMap":{"name":"GRID2","tag":"TABLE"},"index":0,"tagName":"TABLE"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"Columns":[],"ExtractTable":1},{"objNextLinkElement":"","iMaxNumberOfPage":5,"iMaxNumberOfResult":-1,"iDelayBetweenMS":1000,"bContinueOnError":false})
+            uibot3811e3e9a89eb6.PostHXZBData(arrayData,act,date,HxzbapiData)
+            Log.Info("传递3+1核心指标页面数据成功")
+        end if
+    Next
+End Function
+
+
+Function EnterZxkh()
+    //移动到质效考核，点击之
+    #icon("@res:cn9el18c-e1af-4296-14cf-jm1b983ah66g.png")
+    Mouse.Hover({"html":{"attrMap":{"id":"jqContaineraab53","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:a2j5kd1h-3msn-g2nd-hsuv-9ugn6bkp3mfk.png")
+    Mouse.Action({"html":{"attrMap":{"id":"jqHtmlArea51d76","tag":"DIV"},"index":0,"tagName":"DIV"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:default.png")
+    UiElement.Wait({"html":{"attrMap":{"parentid":"jqListCatalogc0bcf","tag":"SPAN"},"index":0,"tagName":"SPAN"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",50000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    Delay(1500)
+    //移动到考核指标点击之
+    #icon("@res:uhakm4qh-grrf-76s0-3utf-9cn48bh8n7ad.png")
+    Mouse.Hover({"html":{"attrMap":{"parentid":"jqListCatalogc0bcf","tag":"SPAN"},"index":0,"tagName":"SPAN"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:kenb82ha-g387-oagd-jf0o-bt0m6jajgcnd.png")
+    Mouse.Action({"html":{"attrMap":{"parentid":"jqListCatalogc0bcf","tag":"SPAN"},"index":0,"tagName":"SPAN"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    Log.Info("进入--质效考核--页面")
+    Dialog.Notify("进入质效考核页面", "UiBot", "0")
+End Function
+
+
+//执行指挥 质效考核抓取数据
+Function getZhiXiaoMonthData(year,month)
+    
+    //点击考核指标、移动点击质效考核、点击查询显示初始表格
+    #icon("@res:8pbei4t5-gf7d-89fi-1uqm-2m47ueagdp69.png")
+    Mouse.Action({"html":{"attrMap":{"parentid":"jqListCatalogc0bcf","tag":"SPAN"},"index":0,"tagName":"SPAN"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:do8f2p6p-oujs-rpdd-21g2-f9v4vee1l0dq.png")
+    Mouse.Hover({"html":{"attrMap":{"id":"jqLinkc36ab","tag":"A"},"index":0,"tagName":"A"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:56ojn38d-06st-n2l1-g060-o4ktue1j2a6v.png")
+    Mouse.Action({"html":{"attrMap":{"id":"jqLinkc36ab","tag":"A"},"index":0,"tagName":"A"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","dbclick",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:lvvskc4n-akvm-0skh-psnl-r5eacbhr79rk.png")
+    Mouse.Action({"html":{"attrMap":{"tag":"BUTTON"},"index":0,"tagName":"BUTTON"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","dbclick",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    Delay(500)
+    //等待初始表格刷新出来
+    #icon("@res:o5u5bpc8-ds3r-hlvc-k7rh-k6jgr6nlu59m.png")
+    UiElement.Wait({"html":{"attrMap":{"parentid":"WidgetParamButton3","tag":"SPAN"},"index":0,"tagName":"SPAN"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",50000,{"bContinueOnError":true,"iDelayAfter":300,"iDelayBefore":200})
+    dim x=1
+    dim bRet,dTime
+    #icon("@res:default.png")
+    bRet = UiElement.Exists({"html":{"attrMap":{"parentid":"WidgetParamButton3","tag":"SPAN"},"index":0,"tagName":"SPAN"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    Do while bRet=false and x<=5
+        // 再次判断质效考核元素是否出现
+        Log.Info("初始表格未出现--"&x&"次")
+        //点击质效考核刷新
+        #icon("@res:56ojn38d-06st-n2l1-g060-o4ktue1j2a6v.png")
+        Mouse.Action({"html":{"attrMap":{"id":"jqLinkc36ab","tag":"A"},"index":0,"tagName":"A"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","dbclick",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+        Delay(500)
+        //等待初始表格刷新出来
+        #icon("@res:o5u5bpc8-ds3r-hlvc-k7rh-k6jgr6nlu59m.png")
+        UiElement.Wait({"html":{"attrMap":{"parentid":"WidgetParamButton3","tag":"SPAN"},"index":0,"tagName":"SPAN"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",50000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        #icon("@res:default.png")
+        bRet = UiElement.Exists({"html":{"attrMap":{"parentid":"WidgetParamButton3","tag":"SPAN"},"index":0,"tagName":"SPAN"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        x=x+1
+        Log.Info("初始表格没有出现--"&x&"次")
+        if x>5
+            App.Kill("iexplore.exe")
+            dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+            Log.Info(dTime&"初始表格没有出现--"&x&"次.重新登录")
+        end if
+    Loop
+
+    //设置目标年月
+    SetDate(year,month)
+    //等待目标表格刷新出来 
+    #icon("@res:o5u5bpc8-ds3r-hlvc-k7rh-k6jgr6nlu59m.png")
+    UiElement.Wait({"html":{"attrMap":{"parentid":"WidgetParamButton3","tag":"SPAN"},"index":0,"tagName":"SPAN"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",34000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    Delay(400)
+
+    //移动到表格
+    #icon("@res:fh54o28t-nndl-g1s7-h25f-qp8fbdbvgi84.png")
+    Mouse.Hover({"html":{"attrMap":{"tag":"BUTTON"},"index":0,"tagName":"BUTTON"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":200,"sKeyModifiers":[],"sSimulate":"simulate"})
+    //滚轮
+    Mouse.Wheel(34,"down", [],{"iDelayAfter":300,"iDelayBefore":200})
+    //抓取数据
+    Log.Info("开始抓取--"&year&"年"&month&"月--质效考核表")
+    dim ZhiXiaoDatAarr 
+    ZhiXiaoDatAarr = UiElement.DataScrap({"html":{"attrMap":{"name":"GRID1","tag":"TABLE"},"index":0,"tagName":"TABLE"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"Columns":[],"ExtractTable":1},{"objNextLinkElement":"","iMaxNumberOfPage":5,"iMaxNumberOfResult":-1,"iDelayBetweenMS":1000,"bContinueOnError":false})
+    // TracePrint ZhiXiaoDatAarr
+    Log.Info("抓取--"&year&"年"&month&"--月质效考核表成功")
+    return ZhiXiaoDatAarr
+End Function
+
+
+//执行指挥 综合管理抓取数据
+Function getZongHeMonthData(year,month)
+    dim dTime
+    //点击考核指标、移动点击综合管理、点击查询显示初始表格
+    #icon("@res:bki1l7vc-57js-o5d8-6mru-olfrsemv6aju.png")
+    Mouse.Action({"html":{"attrMap":{"parentid":"jqListCatalogc0bcf","tag":"SPAN"},"index":0,"tagName":"SPAN"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:u7ojkq1k-3k8k-u0ch-534b-q7od6emj20j3.png")
+    Mouse.Hover({"html":{"attrMap":{"id":"jqLinkce11b","tag":"A"},"index":0,"tagName":"A"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:4akunbdn-eubm-70g5-pogi-inuvh1l37p6e.png")
+    Mouse.Action({"html":{"attrMap":{"id":"jqLinkce11b","tag":"A"},"index":0,"tagName":"A"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","dbclick",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:828n5shg-2qgi-bbgm-o6u1-is7rr58j81bg.png")
+    Mouse.Action({"html":{"attrMap":{"tag":"BUTTON"},"index":0,"tagName":"BUTTON"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","dbclick",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    Delay(500)
+    //等待初始表格刷新
+    #icon("@res:lfos1qsn-tahn-d0ji-lcui-pd1gdliu2kfe.png")
+    UiElement.Wait({"html":{"attrMap":{"parentid":"GRID2.C1","tag":"SPAN"},"index":0,"tagName":"SPAN"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",34000,{"bContinueOnError":true,"iDelayAfter":300,"iDelayBefore":200})
+    dim bRet
+    dim c=1
+    #icon("@res:default.png")
+    bRet = UiElement.Exists({"html":{"attrMap":{"parentid":"GRID2.C1","tag":"SPAN"},"index":0,"tagName":"SPAN"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    Do While bRet=false and c<=5
+        // 再次判断综合管理元素是否出现
+        Log.Info("初始表格未出现--"&c&"次")
+        // 点击综合管理刷新
+        #icon("@res:4akunbdn-eubm-70g5-pogi-inuvh1l37p6e.png")
+        Mouse.Action({"html":{"attrMap":{"id":"jqLinkce11b","tag":"A"},"index":0,"tagName":"A"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","dbclick",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+        #icon("@res:default.png")
+        UiElement.Wait({"html":{"attrMap":{"parentid":"GRID2.C1","tag":"SPAN"},"index":0,"tagName":"SPAN"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        
+        #icon("@res:default.png")
+        bRet = UiElement.Exists({"html":{"attrMap":{"parentid":"GRID2.C1","tag":"SPAN"},"index":0,"tagName":"SPAN"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        c=c+1
+        if c>5
+            dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+            Log.Info(dTime&"初始表格未出现--"&c&"次.重新登录")
+            App.Kill("iexplore.exe")
+        end if
+    Loop
+    //设置目标年月
+    SetDate(year,month)
+    //等待目标表格刷新
+    #icon("@res:lfos1qsn-tahn-d0ji-lcui-pd1gdliu2kfe.png")
+    UiElement.Wait({"html":{"attrMap":{"parentid":"GRID2.C1","tag":"SPAN"},"index":0,"tagName":"SPAN"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",34000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    Delay(400)
+    //移动到表格
+    #icon("@res:fh54o28t-nndl-g1s7-h25f-qp8fbdbvgi84.png")
+    Mouse.Hover({"html":{"attrMap":{"tag":"BUTTON"},"index":0,"tagName":"BUTTON"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":200,"sKeyModifiers":[],"sSimulate":"simulate"})
+    //滚轮
+    Mouse.Wheel(34,"down", [],{"iDelayAfter":300,"iDelayBefore":200})
+    //抓取数据
+    Log.Info("开始抓取--"&year&"年"&month&"月--综合管理表")
+    dim ZongHeDataArr 
+    ZongHeDataArr = UiElement.DataScrap({"html":{"attrMap":{"name":"GRID2","tag":"TABLE"},"index":0,"tagName":"TABLE"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"Columns":[],"ExtractTable":1},{"objNextLinkElement":"","iMaxNumberOfPage":5,"iMaxNumberOfResult":-1,"iDelayBetweenMS":1000,"bContinueOnError":false})
+
+    Log.Info("抓取--"&year&"年"&month&"月--综合管理表--成功")
+    Return ZongHeDataArr 
+End Function
+
+
+//执行指挥 汇总展示抓取数据
+Function getHuiZongMonthData(year,month)
+    dim dTime
+    Delay(500)
+    #icon("@res:dicbik77-83ps-gctj-55br-mepekkhbomni.png")
+    Mouse.Action({"html":{"attrMap":{"tag":"BUTTON"},"index":0,"tagName":"BUTTON"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","dbclick",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    //等待初始表格刷新
+    #icon("@res:n7f5a3l2-b8ns-j30e-6ivv-04fv4op5uiof.png")
+    UiElement.Wait({"html":{"attrMap":{"id":"GRID1.A1","tag":"TD"},"index":0,"tagName":"TD"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",34000,{"bContinueOnError":true,"iDelayAfter":300,"iDelayBefore":200})
+    dim bRet,c=1
+    #icon("@res:91sai7t9-fbmj-bv9c-9p5r-br0pkc5cn4kf.png")
+    bRet = UiElement.Exists({"html":{"attrMap":{"id":"GRID1.A1","tag":"TD"},"index":0,"tagName":"TD"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    Do While bRet=false and c<=5
+        // 再次判断质效考核元素是否出现
+        Log.Info("初始表格未出现--"&c&"次")
+        // 刷新
+        Keyboard.Press("F5", "press", [],{"iDelayAfter":300,"iDelayBefore":200,"sSimulate":"simulate"})
+        #icon("@res:default.png")
+        UiElement.Wait({"html":{"attrMap":{"id":"GRID1.A1","tag":"TD"},"index":0,"tagName":"TD"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        #icon("@res:4ucejngr-4c7s-h7t7-3g7d-5jdb6ppbesjf.png")
+        bRet = UiElement.Exists({"html":{"attrMap":{"id":"GRID1.A1","tag":"TD"},"index":0,"tagName":"TD"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"bContinueOnError":false,"iDelayAfter":3000,"iDelayBefore":10000})
+        c=c+1
+        if c>5
+            dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+            Log.Info(dTime&"初始表格未出现--"&c&"次.重新登录")
+            App.Kill("iexplore.exe")
+        end if
+    Loop
+    //设置目标年月
+    SetDate(year,month)
+    Delay(400)
+    //等待目标表格刷新
+    #icon("@res:gfjudtmc-gm14-f42m-n76b-27v0nrnicb87.png")
+    UiElement.Wait({"html":{"attrMap":{"id":"GRID1.A1","tag":"TD"},"index":0,"tagName":"TD"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"show",34000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    //移动到表格
+    #icon("@res:fh54o28t-nndl-g1s7-h25f-qp8fbdbvgi84.png")
+    Mouse.Hover({"html":{"attrMap":{"tag":"BUTTON"},"index":0,"tagName":"BUTTON"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":200,"sKeyModifiers":[],"sSimulate":"simulate"})
+    //滚轮
+    Mouse.Wheel(20,"down", [],{"iDelayAfter":300,"iDelayBefore":200})
+    //抓取数据
+    Log.Info("开始抓取--"&year&"年"&month&"月--汇总展示表")
+    dim HuiZongDataArr 
+    HuiZongDataArr = UiElement.DataScrap({"html":{"attrMap":{"name":"GRID1","tag":"TABLE"},"index":0,"tagName":"TABLE"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},{"Columns":[],"ExtractTable":1},{"objNextLinkElement":"","iMaxNumberOfPage":5,"iMaxNumberOfResult":-1,"iDelayBetweenMS":1000,"bContinueOnError":false})
+    Log.Info("抓取--"&year&"年"&month&"月--汇总展示表--成功")
+    Return HuiZongDataArr 
+End Function
+
+
+/*
+*考核指标通用时间筛选
+*@param:file,year,month,filename,data
+*/
+function SetDate(year,month)
+
+    //设置年表面、和年深层次
+    #icon("@res:mo8k31ul-q546-s3l1-5jel-gtngsm7rpj3k.png")
+    UiElement.SetAttribute({"html":{"attrMap":{"id":"jqSelectListJsnd","tag":"INPUT"},"index":0,"tagName":"INPUT"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"value",year,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    #icon("@res:default.png")
+    UiElement.SetAttribute({"html":{"attrMap":{"id":"jqSelectJsyf_hidden","tag":"INPUT"},"index":0,"tagName":"INPUT"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"value",year,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    // 设置月表面、和月深层次
+    #icon("@res:8cf1bdpm-r3l6-g0u1-4q7s-hr7rogu1to3q.png")
+    UiElement.SetAttribute({"html":{"attrMap":{"id":"jqSelectJsyf","tag":"INPUT"},"index":0,"tagName":"INPUT"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"value",month,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    #icon("@res:d8jv9d3g-e47j-ekf7-547d-si7a2d39mq2d.png")
+    UiElement.SetAttribute({"html":{"attrMap":{"id":"jqSelectJsyf_hidden","tag":"INPUT"},"index":0,"tagName":"INPUT"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"value",month,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    #icon("@res:out9rjsk-3tpv-7cap-3faf-d76bpd27qj45.png")
+    Mouse.Action({"html":{"attrMap":{"tag":"BUTTON"},"index":0,"tagName":"BUTTON"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","dbclick",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    Delay(5000)
+
+end function
+
+
+
+//数据库返回值正常，可以进行下一步操作
+Function iswrite(url)
+    Log.Info(url)
+    dim me=HTTP.Get(url,{}, 60000)
+    Log.Info(me)
+    dim h=Split(me,":")
+    Log.Info(h)
+    If h[1]='1'
+        // 抓取并写入数据库
+        Log.Info("数据库可以正常写入等操作")
+        return 1
+    Elseif h[1]='0'
+        Log.Info("数据库暂时不能写入等操作")
+        return 0
+    End If
+End Function
+

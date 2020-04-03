@@ -1,0 +1,255 @@
+//20200325下午指挥中心主流程备份
+
+
+import uibot59b66fabdbcb7       //小流程模块
+Import uibot3811e3e9a89eb6      //小方法模块       
+
+Import apistatus                //状态码
+//读取配置
+dim config=uibot59b66fabdbcb7 .readConfig()
+dim fristconfig=config[0]
+dim secondconfig=config[1]
+
+// 132.40.17.183
+// dim Monthcache="http://132.40.22.6/index.php/implement/addmonth/getcache"
+// dim Zxcache="http://132.40.22.6/index.php/implement/addeffect/getcache"
+// dim Zhcache="http://132.40.22.6/index.php/implement/addmultiple/getcache"
+// dim Hzcache="http://132.40.22.6/index.php/implement/addbase/getcache"
+dim ip="http://132.40.22.6"
+dim Monthcache=ip&"/index.php/implement/addmonth/getcache"
+dim Zxcache=ip&"/index.php/implement/addeffect/getcache"
+dim Zhcache=ip&"/index.php/implement/addmultiple/getcache"
+dim Hzcache=ip&"/index.php/implement/addbase/getcache"
+
+
+Do While true
+
+    dim 当前时间=Time.Now()
+    Delay 1000
+    dim dTime
+    dim 分 = Time.Minute(当前时间)
+    dim 秒 = Time.Second(当前时间)
+    dim begin =分&"分"&秒&"秒"
+    TracePrint begin
+    if begin="39分59秒"
+        //获取当前年月"2019-01"--字符串
+        dim yearmonth=uibot3811e3e9a89eb6.getyearmonth() 
+
+        dim x=0
+        // x=520
+        Do While x<=5
+            Try
+                App.Kill("iexplore.exe")
+                //登录流程系统----成功登录返回值是hWeb，后面引用hWeb，否则是false
+                dim liucheng 
+                liucheng = uibot59b66fabdbcb7.loginFrist(fristconfig[0],fristconfig[1],fristconfig[2])
+                // dim liucheng =false
+                if liucheng
+                    //案件收结案
+                    uibot59b66fabdbcb7.AnJianSJ(liucheng,ip)
+                    dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+                    Log.Info(dTime&"--执行流程--案件收结案表数据传递完毕")
+                    Dialog.Notify("案件收结案数据传递完毕", "UiBot", "0")
+                    // 月度统计
+                    dim yuedu={'tw':17,'th':17,'tt':5,'startrow':5,'startcol':2}
+                    dim yueduData
+                    //请求数据库，若返回值为1，继续下一步操作
+                // if iswrite(Monthcache)=1
+                        // yueduData=uibot59b66fabdbcb7.getMonthData(yearmonth)
+                    //抓取并逐条传入操作
+                    uibot59b66fabdbcb7.getMonthData(yearmonth,ip,Monthcache)
+                    dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+                    Log.Info(dTime&"--执行流程--月度统计表数据传递完毕")
+                    Dialog.Notify("月度统计数据传递完毕", "UiBot", "0")
+                // end if 
+                    App.Kill("iexplore.exe")
+                    Log.Info("--执行流程--运行完美落幕~")
+                    Dialog.Notify("--执行流程--运行完美落幕~", "UiBot", "0")
+                    x=520
+                end if
+            Catch err
+                Log.Error (err)
+                App.Kill("iexplore.exe")
+                x=x+1  
+                dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+                Log.Warn(dTime&"--执行流程--运行出现异常---"&x&"次")
+                
+            End Try
+        Loop
+        //读取配置
+        // dim config=uibot59b66fabdbcb7.readConfig()
+        // dim secondconfig=config[1]
+        dim y=0
+        // y=521
+        Do While y<=5
+            Try
+                App.Kill("iexplore.exe")
+                //登录指挥系统--成功登录返回值是hWeb，后面引用hweb，否则是false
+                dim zhihui=uibot59b66fabdbcb7.loginSecond(secondconfig[0],secondconfig[1],secondconfig[2])
+                if zhihui
+                    //进入3+1核心指标
+                    uibot59b66fabdbcb7.EnterHxzb()
+                    //抓取3+1核心指标标头、数据并传递
+                    uibot59b66fabdbcb7.getHxzbTitle(zhihui,ip)
+                    dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+                    Log.Info(dTime&"--执行指挥平台--3+1核心指标表数据传递完毕")
+                    Dialog.Notify("--执行指挥平台--3+1核心指标数据传递完毕", "UiBot", "0")
+                    //进入质效考核
+                    uibot59b66fabdbcb7.EnterZxkh()
+                    
+                    //获取质效考核总api
+                    dim ZxkhUrl,status
+                    Zxkhurl = WebBrowser.GetURL(zhihui,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                    // TracePrint ZxkhUrl
+                    //获取该网页状态码，若状态码为200，进行下一步操作
+                    status =apistatus.api(ZxkhUrl)
+                    log.Info(status)
+                    if status=200
+                        //质效考核,综合管理，汇总展示的数据抓取和传递数据
+
+                        // 请求数据库，若返回值为1，继续下一步操作
+                        // if iswrite(Zxcache)=1
+                            ZhiXiaoloop()
+                            dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+                            Log.Info(dTime&"--执行指挥平台--质效考核表数据传递完毕")
+                            Dialog.Notify("质效考核数据传递完毕", "UiBot", "0")
+                        // end if 
+                        // 请求数据库，若返回值为1，继续下一步操作
+                        // if iswrite(Zhcache)=1
+                            ZongHeloop()
+                            dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+                            Log.Info(dTime&"--执行指挥平台--综合管理表数据传递完毕")
+                            Dialog.Notify("综合管理数据传递完毕", "UiBot", "0")
+                        // end if 
+                        //请求数据库，若返回值为1，继续下一步操作
+                        // if iswrite(Hzcache)=1
+                            HuiZongloop(zhihui)
+                            dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+                            Log.Info(dTime&"--执行指挥平台--汇总展示表数据传递完毕")
+                            Dialog.Notify("汇总展示数据传递完毕", "UiBot", "0")
+                        // end if 
+                        y=521
+                        Log.Info("--执行指挥平台--运行圆满结束~")
+                        Dialog.Notify("--执行指挥平台--运行圆满结束~", "UiBot", "0")
+                        App.Kill("iexplore.exe")
+                    else
+                        dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+                        Log.Warn(dTime&"--执行指挥平台--系统维护中,网页状态码--"&status)
+                        // Return false
+                        App.Kill("iexplore.exe")
+                    end if
+                end if 
+            Catch err
+                Log.Error (err)
+                dTime = Time.Format(Time.Now(),"yyyy-mm-dd hh:mm:ss")
+                y=y+1  
+                Log.Warn(dTime&"--执行指挥平台--运行异常---"&y&"次")
+                Dialog.Notify(err, "UiBot", "0")
+                App.Kill("iexplore.exe")
+            End Try
+        Loop
+     End If
+Loop
+
+
+function ZhiXiaoloop()
+
+    dim zxapi=ip&"/index.php/implement/addeffect"
+    dim zhixiao={'tw':20,'th':20,'tt':2,'startrow':4,'startcol':3,'api':zxapi}
+    //获取当前年月，传入抓取方法中，设置年月
+    dim now = uibot3811e3e9a89eb6.getyearmonth()
+    dim year = cint(Left(now,4))
+    dim month = cint(SubStr(now,6,Len(now)))
+    TracePrint year,month
+    dim zhiXiaoData
+    //设置当前年月，抓取原始数据
+    zhiXiaoData = uibot59b66fabdbcb7.getZhiXiaoMonthData(year,month)
+    //将数据传入方法中，处理成json，传入接口  zhiXiaoData = 
+    if uibot59b66fabdbcb7.iswrite(Zxcache)=1
+        uibot3811e3e9a89eb6.PostZXZHData(zhiXiaoData,zhixiao['tw'],zhixiao['th'],zhixiao['tt'],zhixiao['startrow'],zhixiao['startcol'],zhixiao['api'])
+        Log.Info("--执行指挥平台--传入"&year&"年"&month&"月质效考核成功")
+    Else
+        Log.Info("请求数据库失败，执行下一步")
+    end if 
+end function
+
+
+function ZongHeloop()
+
+    dim zhapi = ip&"/index.php/implement/Addmultiple"
+    dim ZongHe = {'tw':17,'th':20,'tt':2,'startrow':4,'startcol':3,'api':zhapi}
+    //获取当前年月，传入抓取方法中，设置年月
+    dim now = uibot3811e3e9a89eb6.getyearmonth()
+    dim year = CInt(Left(now,4))
+    dim month = CInt(SubStr(now,6,Len(now)))
+    dim ZongHeData
+
+    //设置当前年月，抓取原始数据
+    ZongHeData = uibot59b66fabdbcb7.getZongheMonthData(year,month)
+    // TracePrint zongheData
+    //将数据传入方法中，处理成json，传入接口
+    if uibot59b66fabdbcb7.iswrite(Zhcache)=1
+        zongheData = uibot3811e3e9a89eb6.PostZXZHData(zongheData,zonghe['tw'],zonghe['th'],zonghe['tt'],zonghe['startrow'],zonghe['startcol'],zonghe['api'])
+        Log.Info("--执行指挥平台--传入"&year&"年"&month&"月综合管理成功")
+    Else
+        Log.Info("请求数据库失败，执行下一步")
+    end if
+end function
+
+
+function HuiZongloop(zhihui)
+    dim hzapi = ip&"/index.php/implement/addbase"
+    dim huizong = {'tw':7,'th':9,'startcol':2,'tt':2,'api':hzapi}
+    //获取当前年月，传入抓取方法中，设置年月
+    dim now = uibot3811e3e9a89eb6.getyearmonth()
+    dim year = CInt(Left(now,4))
+    dim month = CInt(SubStr(now,6,Len(now)))
+    dim huizongData
+    
+    //进入汇总展示子页面
+    #icon("@res:b77ilpaq-0uqf-sl96-h3pi-d0e1nki4vdpq.png")
+    Mouse.Action({"html":{"attrMap":{"parentid":"jqListCatalogc0bcf","tag":"SPAN"},"index":0,"tagName":"SPAN"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:7pjup8lk-saf0-n5p2-s9t5-v9hc9ovki886.png")
+    Mouse.Hover({"html":{"attrMap":{"id":"jqLink4fc9e","tag":"A"},"index":0,"tagName":"A"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    #icon("@res:pee9dm23-8aot-4483-rc2f-40m3e2rnpcd7.png")
+    Mouse.Action({"html":{"attrMap":{"id":"jqLink4fc9e","tag":"A"},"index":0,"tagName":"A"},"wnd":[{"app":"iexplore","cls":"IEFrame","title":"*"},{"cls":"Internet Explorer_Server"}]},"left","click",10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"bSetForeground":true,"sCursorPosition":"Center","iCursorOffsetX":0,"iCursorOffsetY":0,"sKeyModifiers":[],"sSimulate":"simulate"})
+    Delay(1000)
+    //汇总展示api
+    dim HzzsUrl,status
+    Hzzsurl = WebBrowser.GetURL(zhihui,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    // TracePrint HzzsUrl
+    status =apistatus.api(HzzsUrl)
+    TracePrint status
+    if status=200
+        //设置当前年月，抓取原始数据
+        HuiZongData = uibot59b66fabdbcb7.getHuizongMonthData(year,month)
+        //将数据传入方法中，处理成json，传入接口
+        if uibot59b66fabdbcb7.iswrite(Hzcache)=1
+            HuiZongData = uibot3811e3e9a89eb6.PostHZZSdata(huizongData,huizong['tw'],huizong['th'],huizong['tt'],huizong['startcol'],huizong['api'])
+            Log.Info("--执行指挥平台--传入"&year&"年"&month&"月汇总展示成功")
+        Else
+            Log.Info("请求数据库失败，执行下一步")
+        end if
+    else
+        Log.Warn("--执行指挥平台--系统维护中,网页状态码----"&status)
+        Return false
+    end if
+end function
+
+// //数据库返回值正常，可以进行下一步操作
+// Function iswrite(url)
+//     Log.Info(url)
+//     dim me=HTTP.Get(url, {}, 60000)
+//     dim objJSON = JSON.Parse(me)
+//     TracePrint objJSON
+//     Dialog.Notify(objJSON, "UiBot", "0")
+//     if objJSON['code']=1
+//         // 抓取并写入数据库
+//         Log.Info("数据库可以正常写入等操作")
+//         return 1
+//     else
+//         Log.Info("数据库暂时不能写入等操作")
+//         return 0
+//     end if
+// End Function
+

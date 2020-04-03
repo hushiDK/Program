@@ -1,0 +1,116 @@
+[2020/3/25 11:05:51][INFO][uibot59b66fabdbcb7.task][15] 2020-03-25 11:05:51--读取配置信息--完毕
+[2020/3/25 11:06:00][INFO][uibot3811e3e9a89eb6.task][169] 当前月份-2020-03
+[2020/3/25 11:06:04][INFO][uibot59b66fabdbcb7.task][50] 200
+[2020/3/25 11:06:18][INFO][uibot59b66fabdbcb7.task][80] 200
+[2020/3/25 11:06:19][INFO][uibot59b66fabdbcb7.task][99] 2020-03-25 11:06:19--执行流程--登录成功
+[2020/3/25 11:06:38][INFO][uibot59b66fabdbcb7.task][169] 200
+[2020/3/25 11:06:38][INFO][uibot59b66fabdbcb7.task][171] 进入执行局旧存页面，开始抓取数据
+[2020/3/25 11:06:38][INFO][uibot59b66fabdbcb7.task][348] 最大页数--5-页
+[2020/3/25 11:06:38][INFO][uibot59b66fabdbcb7.task][351] 进入第-1-页
+[2020/3/25 11:06:41][INFO][uibot59b66fabdbcb7.task][359] 抓取数据
+[2020/3/25 11:06:42][INFO][uibot59b66fabdbcb7.task][351] 进入第-2-页
+[2020/3/25 11:06:45][INFO][uibot59b66fabdbcb7.task][359] 抓取数据
+[2020/3/25 11:06:45][INFO][uibot59b66fabdbcb7.task][351] 进入第-3-页
+[2020/3/25 11:06:48][INFO][uibot59b66fabdbcb7.task][359] 抓取数据
+[2020/3/25 11:06:49][INFO][uibot59b66fabdbcb7.task][351] 进入第-4-页
+[2020/3/25 11:06:51][INFO][uibot59b66fabdbcb7.task][359] 抓取数据
+[2020/3/25 11:06:52][INFO][uibot59b66fabdbcb7.task][351] 进入第-5-页
+[2020/3/25 11:06:54][INFO][uibot59b66fabdbcb7.task][359] 抓取数据
+[2020/3/25 11:06:55][INFO][uibot59b66fabdbcb7.task][380] 关闭子页面，
+[2020/3/25 11:06:55][INFO][uibot59b66fabdbcb7.task][176] 执行局旧存数据--抓取成功
+[2020/3/25 11:07:25][INFO][uibot59b66fabdbcb7.task][182] 处理并传递--执行局旧存数据--成功
+[2020/3/25 11:07:27][INFO][uibot59b66fabdbcb7.task][203] 200
+[2020/3/25 11:07:27][INFO][uibot59b66fabdbcb7.task][205] 进入--执行局新收--页面，开始抓取数据
+[2020/3/25 11:07:28][INFO][uibot59b66fabdbcb7.task][348] 最大页数--10-页
+[2020/3/25 11:07:28][INFO][uibot59b66fabdbcb7.task][351] 进入第-1-页
+[2020/3/25 11:07:30][INFO][uibot59b66fabdbcb7.task][359] 抓取数据
+[2020/3/25 11:07:31][INFO][uibot59b66fabdbcb7.task][351] 进入第-2-页
+[2020/3/25 11:07:34][INFO][uibot59b66fabdbcb7.task][359] 抓取数据
+[2020/3/25 11:07:34][INFO][uibot59b66fabdbcb7.task][351] 进入第-3-页
+[2020/3/25 11:07:37][INFO][uibot59b66fabdbcb7.task][359] 抓取数据
+[2020/3/25 11:07:38][INFO][uibot59b66fabdbcb7.task][351] 进入第-4-页
+[2020/3/25 11:07:40][INFO][uibot59b66fabdbcb7.task][359] 抓取数据
+[2020/3/25 11:07:41][INFO][uibot59b66fabdbcb7.task][351] 进入第-5-页
+[2020/3/25 11:07:43][INFO][uibot59b66fabdbcb7.task][359] 抓取数据
+[2020/3/25 11:07:44][INFO][uibot59b66fabdbcb7.task][351] 进入第-6-页
+[2020/3/25 11:07:47][INFO][uibot59b66fabdbcb7.task][359] 抓取数据
+[2020/3/25 11:07:47][INFO][uibot59b66fabdbcb7.task][351] 进入第-7-页
+[2020/3/25 11:07:52][INFO][uibot59b66fabdbcb7.task][359] 抓取数据
+[2020/3/25 11:07:53][INFO][uibot59b66fabdbcb7.task][351] 进入第-8-页
+[2020/3/25 11:07:55][INFO][uibot59b66fabdbcb7.task][359] 抓取数据
+[2020/3/25 11:07:56][INFO][uibot59b66fabdbcb7.task][351] 进入第-9-页
+[2020/3/25 11:07:59][INFO][uibot59b66fabdbcb7.task][359] 抓取数据
+[2020/3/25 11:07:59][INFO][uibot59b66fabdbcb7.task][351] 进入第-10-页
+[2020/3/25 11:08:03][INFO][uibot59b66fabdbcb7.task][359] 抓取数据
+[2020/3/25 11:08:04][INFO][uibot59b66fabdbcb7.task][380] 关闭子页面，
+[2020/3/25 11:08:04][INFO][uibot59b66fabdbcb7.task][210] 抓取--执行局新收数据--成功
+[2020/3/25 11:08:49][INFO][uibot59b66fabdbcb7.task][216] 处理并传递--执行局新收数据--成功
+[2020/3/25 11:08:50][INFO][uibot38128a1d5acc80.task][49] 2020-03-25 11:08:50--执行流程--案件收结案表数据传递完毕
+[2020/3/25 11:08:59][INFO][uibot59b66fabdbcb7.task][416] 2020-03-25 11:08:59抓取-2020-03-月度统计表头--数据
+[2020/3/25 11:08:59][INFO][uibot59b66fabdbcb7.task][422] 抓取-2020-03-月度表头数据--成功
+[2020/3/25 11:09:09][INFO][uibot59b66fabdbcb7.task][436] 抓取-2020-03-月度下拉数据--成功
+[2020/3/25 11:09:09][INFO][uibot59b66fabdbcb7.task][870] http://132.40.22.6/index.php/implement/addmonth/getcache
+[2020/3/25 11:09:09][INFO][uibot59b66fabdbcb7.task][872] ﻿code:1
+[2020/3/25 11:09:09][INFO][uibot59b66fabdbcb7.task][874] [ "﻿code", "1" ]
+
+[2020/3/25 11:09:09][INFO][uibot59b66fabdbcb7.task][877] 数据库可以正常写入等操作
+[2020/3/25 11:09:09][INFO][uibot3811e3e9a89eb6.task][328] 开始处理并传递-月度统计--数据
+[2020/3/25 11:09:10][INFO][uibot38128a1d5acc80.task][60] 2020-03-25 11:09:10--执行流程--月度统计表数据传递完毕
+[2020/3/25 11:09:10][INFO][uibot38128a1d5acc80.task][64] --执行流程--运行完美落幕~
+[2020/3/25 11:09:16][INFO][uibot59b66fabdbcb7.task][485] 200
+[2020/3/25 11:09:27][INFO][uibot59b66fabdbcb7.task][513] 200
+[2020/3/25 11:09:28][INFO][uibot59b66fabdbcb7.task][524] 2020-03-25 11:09:28--执行指挥平台--登录成功
+[2020/3/25 11:09:40][INFO][uibot59b66fabdbcb7.task][547] 进入核心指标页面
+[2020/3/25 11:09:42][INFO][uibot59b66fabdbcb7.task][560] 200
+[2020/3/25 11:09:45][INFO][uibot59b66fabdbcb7.task][578] 抓取--核心指标--四大效率指标--成功
+[2020/3/25 11:09:55][INFO][uibot59b66fabdbcb7.task][623] 开始抓取--2019年--3+1核心指标数据
+[2020/3/25 11:09:56][INFO][uibot59b66fabdbcb7.task][626] 处理并传递--2019年--3+1核心指标数据--成功
+[2020/3/25 11:10:03][INFO][uibot59b66fabdbcb7.task][623] 开始抓取--2018年--3+1核心指标数据
+[2020/3/25 11:10:04][INFO][uibot59b66fabdbcb7.task][626] 处理并传递--2018年--3+1核心指标数据--成功
+[2020/3/25 11:10:12][INFO][uibot59b66fabdbcb7.task][623] 开始抓取--2017年--3+1核心指标数据
+[2020/3/25 11:10:13][INFO][uibot59b66fabdbcb7.task][626] 处理并传递--2017年--3+1核心指标数据--成功
+[2020/3/25 11:10:20][INFO][uibot59b66fabdbcb7.task][623] 开始抓取--2016年--3+1核心指标数据
+[2020/3/25 11:10:21][INFO][uibot59b66fabdbcb7.task][626] 处理并传递--2016年--3+1核心指标数据--成功
+[2020/3/25 11:10:28][INFO][uibot59b66fabdbcb7.task][623] 开始抓取--2016年至2018年--3+1核心指标数据
+[2020/3/25 11:10:30][INFO][uibot59b66fabdbcb7.task][626] 处理并传递--2016年至2018年--3+1核心指标数据--成功
+[2020/3/25 11:10:37][INFO][uibot59b66fabdbcb7.task][646] 抓取3+1核心指标页面数据
+[2020/3/25 11:10:39][INFO][uibot59b66fabdbcb7.task][649] 传递3+1核心指标页面数据成功
+[2020/3/25 11:10:46][INFO][uibot59b66fabdbcb7.task][646] 抓取3+1核心指标页面数据
+[2020/3/25 11:10:48][INFO][uibot59b66fabdbcb7.task][649] 传递3+1核心指标页面数据成功
+[2020/3/25 11:10:49][INFO][uibot38128a1d5acc80.task][93] 2020-03-25 11:10:49--执行指挥平台--3+1核心指标表数据传递完毕
+[2020/3/25 11:10:55][INFO][uibot59b66fabdbcb7.task][669] 进入--质效考核--页面
+[2020/3/25 11:10:56][INFO][uibot38128a1d5acc80.task][104] 200
+[2020/3/25 11:10:56][INFO][uibot3811e3e9a89eb6.task][169] 当前月份-2020-03
+[2020/3/25 11:11:17][INFO][uibot59b66fabdbcb7.task][728] 开始抓取--2020年3月--质效考核表
+[2020/3/25 11:11:17][INFO][uibot59b66fabdbcb7.task][732] 抓取--2020年3--月质效考核表成功
+[2020/3/25 11:11:17][INFO][uibot59b66fabdbcb7.task][870] http://132.40.22.6/index.php/implement/addeffect/getcache
+[2020/3/25 11:11:17][INFO][uibot59b66fabdbcb7.task][872] ﻿code:1
+[2020/3/25 11:11:17][INFO][uibot59b66fabdbcb7.task][874] [ "﻿code", "1" ]
+
+[2020/3/25 11:11:17][INFO][uibot59b66fabdbcb7.task][877] 数据库可以正常写入等操作
+[2020/3/25 11:11:40][INFO][uibot38128a1d5acc80.task][168] --执行指挥平台--传入2020年3月质效考核成功
+[2020/3/25 11:11:40][INFO][uibot38128a1d5acc80.task][112] 2020-03-25 11:11:40--执行指挥平台--质效考核表数据传递完毕
+[2020/3/25 11:11:40][INFO][uibot3811e3e9a89eb6.task][169] 当前月份-2020-03
+[2020/3/25 11:12:02][INFO][uibot59b66fabdbcb7.task][787] 开始抓取--2020年3月--综合管理表
+[2020/3/25 11:12:02][INFO][uibot59b66fabdbcb7.task][791] 抓取--2020年3月--综合管理表--成功
+[2020/3/25 11:12:02][INFO][uibot59b66fabdbcb7.task][870] http://132.40.22.6/index.php/implement/addmultiple/getcache
+[2020/3/25 11:12:02][INFO][uibot59b66fabdbcb7.task][872] ﻿code:1
+[2020/3/25 11:12:02][INFO][uibot59b66fabdbcb7.task][874] [ "﻿code", "1" ]
+
+[2020/3/25 11:12:02][INFO][uibot59b66fabdbcb7.task][877] 数据库可以正常写入等操作
+[2020/3/25 11:12:21][INFO][uibot38128a1d5acc80.task][191] --执行指挥平台--传入2020年3月综合管理成功
+[2020/3/25 11:12:21][INFO][uibot38128a1d5acc80.task][119] 2020-03-25 11:12:21--执行指挥平台--综合管理表数据传递完毕
+[2020/3/25 11:12:21][INFO][uibot3811e3e9a89eb6.task][169] 当前月份-2020-03
+[2020/3/25 11:12:41][INFO][uibot59b66fabdbcb7.task][836] 开始抓取--2020年3月--汇总展示表
+[2020/3/25 11:12:41][INFO][uibot59b66fabdbcb7.task][839] 抓取--2020年3月--汇总展示表--成功
+[2020/3/25 11:12:41][INFO][uibot59b66fabdbcb7.task][870] http://132.40.22.6/index.php/implement/addbase/getcache
+[2020/3/25 11:12:41][INFO][uibot59b66fabdbcb7.task][872] ﻿code:1
+[2020/3/25 11:12:41][INFO][uibot59b66fabdbcb7.task][874] [ "﻿code", "1" ]
+
+[2020/3/25 11:12:41][INFO][uibot59b66fabdbcb7.task][877] 数据库可以正常写入等操作
+[2020/3/25 11:12:41][INFO][uibot3811e3e9a89eb6.task][268] 开始处理并传递--汇总--数据
+[2020/3/25 11:12:42][INFO][uibot3811e3e9a89eb6.task][278] 处理并传递--汇总--数据成功
+[2020/3/25 11:12:42][INFO][uibot38128a1d5acc80.task][227] --执行指挥平台--传入2020年3月汇总展示成功
+[2020/3/25 11:12:42][INFO][uibot38128a1d5acc80.task][126] 2020-03-25 11:12:42--执行指挥平台--汇总展示表数据传递完毕
+[2020/3/25 11:12:42][INFO][uibot38128a1d5acc80.task][130] --执行指挥平台--运行圆满结束~
+[2020/3/25 11:19:33][INFO][][0] 运行已结束

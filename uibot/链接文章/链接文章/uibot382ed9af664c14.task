@@ -1,0 +1,296 @@
+Import me
+
+dim data 
+data = readexcel()
+
+selectdetail(data)
+
+
+// 读取excel表格链接
+Function readexcel()
+
+    dim bRet = ""
+    dim arrayRet = ""
+    dim objExcelWorkBook = ""
+    dim hWeb = ""
+    dim 行
+
+    objExcelWorkBook = Excel.OpenExcel("C:\\Users\\asus\\Desktop\\链接文章\\链接.xlsx",true)
+    Delay(1000)
+    #icon("@res:7uov2enk-ithc-bifo-5202-6f5ts7bgsirm.png")
+    bRet = UiElement.Exists({"wnd":[{"app":"EXCEL","cls":"NUIDialog","title":"Microsoft Office 激活向导"},{"cls":"NetUIHWND"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    If bRet=true
+        #icon("@res:gkbk2q3d-c7j8-glmv-ojff-np4vvcehbj9k.png")
+        Window.Close({"wnd":[{"cls":"NUIDialog","title":"Microsoft Office 激活向导","app":"EXCEL"}]})
+    End If
+    #icon("@res:1hi9ug5v-cqd0-gih1-h5v6-b9ng9a1mnt3k.png")
+    bRet = UiElement.Exists({"wnd":[{"cls":"XLMAIN","title":"链接.xlsx - Excel(产品激活失败)","app":"EXCEL"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    If bRet=true
+        #icon("@res:u7b9raes-721r-hc7q-0oms-s87mv2kkkm6m.png")
+        Window.Show({"wnd":[{"cls":"XLMAIN","title":"链接.xlsx - Excel(产品激活失败)","app":"EXCEL"}]},"max")
+    End If
+    
+    行 = Excel.GetRowsCount(objExcelWorkBook,"Sheet1")
+    arrayRet = Excel.ReadRange(objExcelWorkBook,"Sheet1",[[2,1],[行,3]])
+    Excel.CloseExcel(objExcelWorkBook,true)
+    TracePrint arrayRet
+    Return arrayRet
+
+End Function
+
+// 遍历链接筛选有效链接
+Function selectdetail(arrayRet)
+    dim objExcelWorkBook = Excel.OpenExcel("C:\\Users\\asus\\Desktop\\链接文章\\链接.xlsx",true)
+    Delay(1000)
+    #icon("@res:7uov2enk-ithc-bifo-5202-6f5ts7bgsirm.png")
+    dim bRet = UiElement.Exists({"wnd":[{"app":"EXCEL","cls":"NUIDialog","title":"Microsoft Office 激活向导"},{"cls":"NetUIHWND"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    If bRet=true
+        #icon("@res:gkbk2q3d-c7j8-glmv-ojff-np4vvcehbj9k.png")
+        Window.Close({"wnd":[{"cls":"NUIDialog","title":"Microsoft Office 激活向导","app":"EXCEL"}]})
+    End If
+    #icon("@res:1hi9ug5v-cqd0-gih1-h5v6-b9ng9a1mnt3k.png")
+    bRet = UiElement.Exists({"wnd":[{"cls":"XLMAIN","title":"链接.xlsx - Excel(产品激活失败)","app":"EXCEL"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    If bRet=true
+        #icon("@res:u7b9raes-721r-hc7q-0oms-s87mv2kkkm6m.png")
+        Window.Show({"wnd":[{"cls":"XLMAIN","title":"链接.xlsx - Excel(产品激活失败)","app":"EXCEL"}]},"max")
+    End If
+
+    For v=0 to len(arrayRet)-1 step 1
+        if arrayRet[v][2]="已操作"
+            Continue
+        end if 
+        //打开网页进入链接，执行数据抓取存入等操作
+        open(arrayRet[v][1])
+        Excel.WriteCell(objExcelWorkBook,"Sheet1",[v+2,3],"已操作",true)
+    Next
+    Excel.CloseExcel(objExcelWorkBook,true)
+End Function
+
+Function open(url)
+
+    dim bRet,sRet,arrElement,hWeb,标题
+    dim title,ord,auth,date,body,objDatabase
+    // url="https://mp.weixin.qq.com/s/3lO2iRiakiDiJRxb2PTo_Q"
+    // url="https://mp.weixin.qq.com/s/E49fCjlHR3QCYquPdAKLrg"
+    // url="https://mp.weixin.qq.com/s/8WifVVqP67eUt6b-5T82Tw"
+    hWeb = WebBrowser.Create("chrome",url,10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"sBrowserPath":"","sStartArgs":""})
+    Delay(1000)
+    #icon("@res:g3f35s0n-qtke-k80o-di1l-45j8q7j9oj0f.png")
+    bRet = UiElement.Exists({"wnd":[{"app":"chrome","cls":"Chrome_WidgetWin_1","title":"*"},{"cls":"Intermediate D3D Window"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    if bRet=true
+        #icon("@res:46pe106j-9ate-1trq-dr96-9lkjlf48cptu.png")
+        Window.Show({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"*","app":"chrome"}]},"max")
+    end if
+    
+    
+    // dim arrElement,sRet
+    #icon("@res:hieir3oi-e6gs-r1it-dddq-fr3veekasnjk.png")
+    arrElement = UiElement.GetChildren({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"*","app":"chrome"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}],"html":{"tagName":"DIV","attrMap":{"tag":"DIV","id":"img-content"},"index":0}},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    arrElement = splice(arrElement,0,2)  /*H2,div,div*/
+    
+    // objDatabase = Database.CreateDB("MySQL",{"charset":"utf8","database":"test","host":"localhost","password":"123456","port":"3306","user":"Mr"})
+    objDatabase = Database.CreateDB("MySQL",{"charset":"utf8","database":"test","host":"localhost","password":"123456","port":"3306","user":"Mr"})
+    // TracePrint arrElement[0]['html']["attrMap" ]['tag']
+    if arrElement[0]['html']["attrMap"]['tag']="H2"
+        // dim 标题
+        标题 = UiElement.GetValue(arrElement[0],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        标题 = delspace(标题)
+        title= 标题
+        // iRet = Database.ExecuteSQL(objDatabase ,"insert into wechat(title) values('标题') ", {"args":[]})
+        // TracePrint 标题
+    end if
+
+    dim 二级 = UiElement.GetChildren(arrElement[1],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    For Each v In 二级
+        // TracePrint v
+        if v['html']["attrMap"]['tag']="SPAN"
+            dim zi
+            zi = UiElement.GetChildren(v,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+            // TracePrint zi
+            dim auth1,auth2
+            auth=" "
+            if Len(zi)<>0
+                auth1 = UiElement.GetValue(zi[0],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                auth1 = delspace(auth1)
+                ord=auth1
+                // TracePrint auth1
+            else
+                auth2=UiElement.GetValue(v,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                auth2 = delspace(auth2)
+                auth = auth2
+                TracePrint auth
+            end if
+
+        elseif v['html']["attrMap"]['tag']="EM"
+            dim times
+            times=UiElement.GetValue(v,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+            date=times
+            // TracePrint times
+        end if
+    Next
+    dim 正文
+    正文 = WebBrowser.GetHTML(hWeb,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    正文 = me.h(正文)
+   
+    body= Replace(CStr(正文),'"',"'",false)
+    body= Replace(body,';',"",false)
+    body = Replace(body,"[","",false)
+    body = Replace(body,"]","",false)
+    // TracePrint body
+
+    // dim y='insert into wecchat(title,ord,auth,date,body) VALUES("'&title&'","'&ord&'","'&auth&'","'&date&'","'&body0&'");'
+    // TracePrint y
+    dim h='insert into wecchat(title,ord,auth,date,body) VALUES(%s,%s,%s,%s,%s);'
+
+    dim iRet
+    TracePrint title
+    TracePrint ord
+    TracePrint auth
+    TracePrint date
+    iRet = Database.ExecuteSQL(objDatabase ,h, {"args":[title,ord,auth,date,body]})
+    Database.CloseDB(objDatabase)
+    App.Kill("chrome.exe")
+
+End Function
+
+
+/*
+*将数据的空格删掉，换行处理成特殊格式
+*@parter:data
+*return：data
+*/
+Function delspace(data)
+
+    data = Replace(data," ","",false)
+    data = Replace(data,"\r","",false)
+    data = Replace(data,"\n","",false)
+    data = Replace(data,"\t","",false)
+    // data = Replace(data,"\r","&",false)
+    // data = Replace(data,"\n","&",false)
+    // data = Replace(data,"\t","&",false)
+    Return data
+
+End Function
+
+
+
+
+
+/*
+*利用递归将换行处理后特殊格式中多余的换行处理掉
+*@parter:data
+*return：data
+*/
+// dim data
+// data="d&&&&sj&io&&&j"
+// data=delchange(data)
+// TracePrint data
+Function delchange(data)
+    data = Replace(data,"&&","&",false)
+    TracePrint data
+    dim iRet
+    iRet = InStr(data,"&&",1,false)
+    if iRet>0
+        return delchange(data)
+    else
+        TracePrint "123456"
+        data = Replace(data,"&","\r\n",false)
+        TracePrint data
+        Return data
+    end if
+End Function
+
+// dim x=5
+// x=函数名(x)
+// TracePrint x
+// Function 函数名(x)
+//     x=x-1
+//     TracePrint x
+//     If x<>1
+//         Return 函数名(x)
+//     else
+//         TracePrint x
+//         Return x
+//     End If
+// End Function
+
+
+
+
+Function opennnnnnnnnn(url1816)
+
+    dim url,bRet,sRet,arrElement,hWeb,标题
+    // url="https://mp.weixin.qq.com/s/3lO2iRiakiDiJRxb2PTo_Q"
+    url="https://mp.weixin.qq.com/s/8WifVVqP67eUt6b-5T82Tw"
+    hWeb = WebBrowser.Create("chrome",url,10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"sBrowserPath":"","sStartArgs":""})
+    Delay(1000)
+    #icon("@res:g3f35s0n-qtke-k80o-di1l-45j8q7j9oj0f.png")
+    bRet = UiElement.Exists({"wnd":[{"app":"chrome","cls":"Chrome_WidgetWin_1","title":"*"},{"cls":"Intermediate D3D Window"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    if bRet=true
+        #icon("@res:46pe106j-9ate-1trq-dr96-9lkjlf48cptu.png")
+        Window.Show({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"*","app":"chrome"}]},"max")
+    end if 
+    
+    // dim arrElement,sRet
+    #icon("@res:hieir3oi-e6gs-r1it-dddq-fr3veekasnjk.png")
+    arrElement = UiElement.GetChildren({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"*","app":"chrome"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}],"html":{"tagName":"DIV","attrMap":{"tag":"DIV","id":"img-content"},"index":0}},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    arrElement = splice(arrElement,0,2)
+    // TracePrint arrElement[0]['html']["attrMap" ]['tag']
+    if arrElement[0]['html']["attrMap"]['tag']="H2"
+        // dim 标题
+        标题 = UiElement.GetValue(arrElement[0],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        TracePrint 标题
+    end if 
+
+    dim 二级 = UiElement.GetChildren(arrElement[1],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    For Each v In 二级
+        // TracePrint v
+        if v['html']["attrMap"]['tag']="SPAN"
+            dim zi
+            zi = UiElement.GetChildren(v,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+            // TracePrint zi
+            dim auth
+            if Len(zi)<>0
+                auth = UiElement.GetValue(zi[0],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                TracePrint auth
+            else
+                auth=UiElement.GetValue(v,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                TracePrint auth
+            end if
+        elseif v['html']["attrMap"]['tag']="EM"
+            dim times
+            times=UiElement.GetValue(v,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+            TracePrint times
+        end if
+    Next
+    dim 正文
+    正文=UiElement.GetChildren(arrElement[2],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    For Each x In 正文
+        // TracePrint x
+        dim 文本,y
+        y = UiElement.GetChildren(x,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        // TracePrint y
+        if Len(y)=0 or y[0]['html']["attrMap"]['tag']="BR"
+            文本 = UiElement.GetValue(x,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+            TracePrint 文本
+        else
+            For Each k In y
+                if k['html']["attrMap"]['tag']<>"IMG" 
+                    // dim sRet
+                    文本 = UiElement.GetValue(k,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                    TracePrint 文本
+                else 
+                    sRet = UiElement.GetAttribute(k,"src",{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                    TracePrint sRet
+                    dim iPID = ""
+                    dim now
+                    // 标题="辉煌"
+                    now =Time.Timer()
+                    WebBrowser.Download(hWeb,sRet,"C:\\Users\\asus\\Desktop\\链接文章\\图片\\"&now&".jpg",true,100000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                end if
+            Next
+        end if
+    Next
+
+End Function
+

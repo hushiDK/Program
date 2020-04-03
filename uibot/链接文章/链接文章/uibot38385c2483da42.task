@@ -1,0 +1,127 @@
+
+Import me
+
+Function open(url)
+
+    dim url,bRet,sRet,arrElement,hWeb,标题
+    dim title,ord,auth,date,body,objDatabase
+    // url="https://mp.weixin.qq.com/s/3lO2iRiakiDiJRxb2PTo_Q"
+    // url="https://mp.weixin.qq.com/s/E49fCjlHR3QCYquPdAKLrg"
+    url="https://mp.weixin.qq.com/s/8WifVVqP67eUt6b-5T82Tw"
+    hWeb = WebBrowser.Create("chrome",url,10000,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200,"sBrowserPath":"","sStartArgs":""})
+    Delay(1000)
+    #icon("@res:g3f35s0n-qtke-k80o-di1l-45j8q7j9oj0f.png")
+    bRet = UiElement.Exists({"wnd":[{"app":"chrome","cls":"Chrome_WidgetWin_1","title":"*"},{"cls":"Intermediate D3D Window"}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    if bRet=true
+        #icon("@res:46pe106j-9ate-1trq-dr96-9lkjlf48cptu.png")
+        Window.Show({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"*","app":"chrome"}]},"max")
+    end if
+    
+    
+    // dim arrElement,sRet
+    #icon("@res:hieir3oi-e6gs-r1it-dddq-fr3veekasnjk.png")
+    arrElement = UiElement.GetChildren({"wnd":[{"cls":"Chrome_WidgetWin_1","title":"*","app":"chrome"},{"cls":"Chrome_RenderWidgetHostHWND","title":"Chrome Legacy Window"}],"html":{"tagName":"DIV","attrMap":{"tag":"DIV","id":"img-content"},"index":0}},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    arrElement = splice(arrElement,0,2)  /*H2,div,div*/
+    
+    // objDatabase = Database.CreateDB("MySQL",{"charset":"utf8","database":"test","host":"localhost","password":"123456","port":"3306","user":"Mr"})
+    objDatabase = Database.CreateDB("MySQL",{"charset":"utf8","database":"test","host":"localhost","password":"123456","port":"3306","user":"Mr"})
+    // TracePrint arrElement[0]['html']["attrMap" ]['tag']
+    if arrElement[0]['html']["attrMap"]['tag']="H2"
+        // dim 标题
+        标题 = UiElement.GetValue(arrElement[0],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+        标题 = delspace(标题)
+        title= 标题
+        // iRet = Database.ExecuteSQL(objDatabase ,"insert into wechat(title) values('标题') ", {"args":[]})
+        // TracePrint 标题
+    end if
+
+    dim 二级 = UiElement.GetChildren(arrElement[1],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    For Each v In 二级
+        // TracePrint v
+        if v['html']["attrMap"]['tag']="SPAN"
+            dim zi
+            zi = UiElement.GetChildren(v,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+            // TracePrint zi
+            dim auth1,auth2
+            auth=" "
+            if Len(zi)<>0
+                auth1 = UiElement.GetValue(zi[0],{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                auth1 = delspace(auth1)
+                act['ord']=auth1
+                ord=auth1
+                // TracePrint auth1
+            else
+                auth2=UiElement.GetValue(v,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+                auth2 = delspace(auth2)
+                auth=auth2
+                // TracePrint auth2
+            end if
+
+        elseif v['html']["attrMap"]['tag']="EM"
+            dim times
+            times=UiElement.GetValue(v,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+            // act['date']=times
+            date=times
+            // TracePrint times
+        end if
+    Next
+    dim 正文
+    正文 = WebBrowser.GetHTML(hWeb,{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+    正文 = me.h(正文)
+   
+    body= Replace(CStr(正文),'"',"'",false)
+    dim body0= Replace(body,';',"",false)
+    // body0 = body0[0]
+    body0 = Replace(body0,"[","",false)
+    body0 = Replace(body0,"]","",false)
+    TracePrint type(body0)
+    TracePrint body0
+
+    // dim y='insert into wecchat(title,ord,auth,date,body) VALUES("'&title&'","'&ord&'","'&auth&'","'&date&'","'&body0&'");'
+    // TracePrint y
+    dim h='insert into wecchat(title,ord,auth,date,body) VALUES(%s,%s,%s,%s,%s);'
+
+    dim iRet
+    iRet = Database.ExecuteSQL(objDatabase ,h, {"args":[title,ord,auth,date,body0]})
+
+    Database.CloseDB(objDatabase)
+
+End Function
+
+/*
+*将数据的空格删掉，换行处理成特殊格式
+*@parter:data
+*return：data
+*/
+Function delspace(data)
+    data = Replace(data," ","",false)
+    data = Replace(data,"\r","",false)
+    data = Replace(data,"\n","",false)
+    data = Replace(data,"\t","",false)
+    // data = Replace(data,"\r","&",false)
+    // data = Replace(data,"\n","&",false)
+    // data = Replace(data,"\t","&",false)
+    Return data
+End Function
+
+
+/*
+*利用递归将换行处理后特殊格式中多余的换行处理掉
+*@parter:data
+*return：data
+*/
+Function delchange(data)
+    data = Replace(data,"&&","&",false)
+    // TracePrint data
+    dim objDatabase = ""
+    dim iRet
+    iRet = InStr(data,"&&",1,false)
+    if iRet>0
+        return delchange(data)
+    else
+        data = Replace(data,"&","\r\n",false)
+        // TracePrint data
+        Return data
+    end if
+End Function
+

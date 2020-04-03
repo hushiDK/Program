@@ -1,0 +1,405 @@
+//方法包
+/*
+*处理案件收结案数据时间格式
+*@parameter：初始时间格式，"19-08-12" or " "
+*return:"20190812"
+*/
+// act={'lawyerid':v[3],'event':v[0],'statusid':v[2],'aliasid':v[1],'endmethodid':v[5],'enddate':maketime(v[4])}
+// TracePrint act
+Function maketime(datetime)
+    if datetime<>" "
+        // dim x="19-08-12"
+        datetime = Replace(datetime,"-","",false)
+        dim year = Time.Format(Time.Date(),"yyyy")
+        year = Left(year,2)&datetime
+        // TracePrint year
+        Return year
+    end if 
+    Return datetime
+End Function
+
+
+/*
+*截取数组中特定的有效数据,第5行有效数据到倒数第二行，最后一条数据单拎进去
+*@param：data
+*return：data
+*/
+Function SpliceMonth(data)
+    dim arr=[]
+    for i =5 to UBound(data)-2
+        push(arr,data[i])
+    next
+    Return arr
+End Function
+
+/*
+*比较月度统计表头数据和总体数据，返回出固定格式的数据
+*@param：表头数据，总详细数据
+*return：
+*/
+Function getActData(data1,data2)
+    dim x=[]
+    dim act=[]
+    For Each v In data1
+        push(x,v[0])
+    Next
+
+    For Each i In data2
+        if InStr(CStr(x),i[0],1,false)>0
+            dim head=i[0]
+            insert(i,1,'总计')
+            push(act,i)
+            continue
+        else
+            insert(i,0,head)
+            push(act,i)
+        end if        
+    Next
+    Return act
+End Function
+
+
+
+/**
+* 递归处理字符串 修改表头
+* @exam ["序号","法院\r\n（含管辖）","首次执行案件","","","","","","","","","","","","恢复执行案件","","","其他","",""]
+* @return ["序号","法院\r\n（含管辖）","首次执行案件","首次执行案件","首次执行案件","首次执行案件","首次执行案件","首次执行案件","首次执行案件","首次执行案件","首次执行案件","首次执行案件","首次执行案件","首次执行案件","恢复执行案件","恢复执行案件","恢复执行案件","其他","其他","其他"]
+**/ 
+function repalceSpaceInArr(test)
+    dim res
+    res=findInfoFromArray("",test)
+    if res>0
+        test[res]=test[res-1]
+        repalceSpaceInArr(test)
+    end if
+    return test
+end function
+
+/**
+* 查找字符串在字符串的位置 没有找到返回-1
+* @param string,string
+* @return in 
+**/
+function findInfoFromArray(find,dataArray)
+    for i=0 to Len(dataArray)-1
+        if find=dataArray[i]
+            return i
+        end if
+    next
+    return -1
+end function
+
+/**
+*  补充数组长度 长度不足 给数组前+空格
+* @param array table
+* @param int need len
+* @return array
+**/ 
+function addArrLen(table,needlen)
+    if Len(table)<needlen
+        unshift(table,"")
+        addArrLen(table,needlen)
+    end if
+    return table
+end function
+
+/** 
+* 修复表头
+* @param table arr 表数据
+* @param tw int 表长度
+* @param th int 表高度
+* @param tt int 表头占行
+**/ 
+function fixFormTablehead(table,tw,th,tt)
+    for i=0 to tt-1
+        table[i]=repalceSpaceInArr(table[i])
+        table[i]=addArrLen(table[i],tw)
+    next
+    return table
+end function
+
+
+/**
+* 处理字符串中的特殊字符（删除换行）
+* x= "执行完毕\r\n案件结案\r\n平均用时\r\n(天/件）"
+**/ 
+function DelLinefeed(str)
+    str = Replace(str,"\r","",false)
+    str = Replace(str,"\n","",false)
+    str= Replace(str,"\t","",false)
+    Return str
+end function
+
+/*
+*将字符串中的"--"替换"0"
+*@param：str
+*/
+function replZero(str)
+    str = Replace(str,"--","0",false)
+    Return str
+end function
+
+/*
+*将字符串中的" "替换"0"
+*@param：str
+*/ 
+function repZero(str)
+    if str=" "
+        str = "0"
+    end if
+    Return str
+end function
+
+/*
+*删除字符串中的","
+*@param：str
+*/
+function DelDh(str)
+    str = Replace(str,",","",false)
+    Return str
+end function
+
+/*
+*获取当前日期的特定格式(6位)
+*@return："2019-01"--字符串
+*/
+Function getyearmonth() 
+    dim dTime = Time.Date()
+    dTime = Time.Format(dTime,"yyyy-mm")
+    log.Info("当前月份-"&dTime)
+    Return dTime
+End Function
+
+
+
+/** 
+* 获取质效考核、综合管理数据,并整理数据，然后逐条传递数据
+* @param table arr 表数据
+* @param tw int 表长度
+* @param th int 表高度
+* @param tt int 表头占行
+* @param startrow int 第几行开始获取
+* @param startcol int 第几列开始获取
+* @return array
+**/ 
+function PostZXZHData(table,tw,th,tt,startrow,startcol,api)
+    table=fixFormTablehead(table,tw,th,tt)
+    dim actdic={}
+    For i=startrow-1 to th-1
+        for j=startcol-1 to tw-1
+            //[首次执行案件(一级表头)，各种执结比例(.....二级表头)，序号，法院名称，具体数据]
+            //获取当前日期
+            dim enddate = Time.Format(Time.Date(),"yyyymmdd")
+            dim startdate= SubStr(enddate,1,4)&"0101"
+            // dim x={'sortid':'一级表头','standardid':'二级表头','courtid':'法院名称','number':2015}
+            actdic={'sortid':table[0][j],'standardid':DelLinefeed(table[1][j]),'courtid':table[i][1],'number':replZero(table[i][j]),'startdate':startdate,'enddate':enddate}
+            // TracePrint actdic
+            // File.Append("C:\\Users\\tpwy\\Desktop\\质效考核测试.txt",JSON.Stringify(actdic),"gbk")
+            dim h=jiekou(api,actdic)
+            TracePrint(h)
+        next
+    Next
+end function
+
+/** 
+* 获取核心指标数据，整理数据，然后逐条传递数据
+* @param table arr 表数据
+* @param tw int 表长度
+* @param th int 表高度
+* @param tt int 表头占行
+* @param startrow int 第几行开始获取
+* @param startcol int 第几列开始获取
+* @param date ：表的来源时间
+* @return array
+**/ 
+
+function PostHXZBData(data,act,date,api)
+    dim actdic={}
+    // Log.Info("处理并传递--"&date&"--核心指标数据")
+    Dialog.Notify("开始处理并传递--核心指标--数据", "UiBot", "0")
+    For v=2  to UBound(data)
+        actdic={'courtid':data[v][1],'prank':replZero(data[v][2]),'brank':replZero(data[v][3]),'pendintime':replZero(data[v][4]),'old':replZero(data[v][5]),'new':replZero(data[v][6]),'end':replZero(data[v][7]),'nendintime':replZero(data[v][8]),'nendouttime':replZero(data[v][9]),'ing':replZero(data[v][10]),'halfmonth':replZero(data[v][11]),'halfsell':replZero(data[v][12]),'hmoney':act[0],'nmoney':act[1],'exeask':act[2],'execase':act[3],'years':date,'yearscourt':date&data[v][1]}
+        // TracePrint actdic
+        // File.Append("C:\\Users\\tpwy\\Desktop\\核心指标.txt",JSON.Stringify(actdic),"gbk")
+        dim h=jiekou(api,actdic)
+        TracePrint(h)
+    Next
+    // Log.Info("处理并传递3+1核心指标数据成功")
+    Dialog.Notify("处理并传递--3+1核心指标--数据成功", "UiBot", "0")
+end function
+
+
+/*
+*获取汇总展示数据，并整理数据，逐条传递数据
+*@param：data
+*return：status
+*/
+Function PostHZZSdata(table,tw,th,tt,startcol,api)
+    table=fixFormTablehead(table,tw,th,tt)
+    //获取当前日期
+    dim enddate = Time.Format(Time.Date(),"yyyymmdd")
+    dim startdate= SubStr(enddate,1,4)&"0101"
+    // dim arrayData=[]
+    dim actdic={}
+    log.Info("开始处理并传递--汇总--数据")
+    Dialog.Notify("开始处理并传递汇总数据", "UiBot", "0")
+    For i=startcol to th-startcol
+        //案件类型,案件数,新收,旧存,已结,未结,已结到位金额,统计开始时间,统计当前时间
+        actdic={'sortid':DelLinefeed(table[i][0]),'eventnum':DelDh(table[i][1]),'new':DelDh(table[i][2]),'old':DelDh(table[i][3]),'end':DelDh(table[i][4]),'ing':DelDh(table[i][5]),'money':DelDh(replZero(table[i][6])),'startdate':startdate,'enddate':enddate}
+        // TracePrint actdic 
+        // File.Append("C:\\Users\\tpwy\\Desktop\\汇总.txt",JSON.Stringify(actdic),"gbk")
+        dim h=jiekou(api,actdic)
+        TracePrint h
+    next
+    Log.Info("处理并传递--汇总--数据成功")
+    Dialog.Notify("处理并传递汇总数据成功", "UiBot", "0")
+
+End Function
+
+
+//案件收结案数据传输
+Function postAnJianSJData(data,mark,ip)
+    // dim ip="http://132.40.22.6"
+    dim ajsjapi=ip&"/index.php/implement/addevent"
+    dim act={}
+    For Each v In data
+        // TracePrint v
+        act={'lawyerid':v[3],'event':v[0],'statusid':v[2],'aliasid':v[1],'endmethodid':v[5],'enddate':maketime(v[4]),'mark':mark}
+        // TracePrint act
+        // TracePrint zxzdhapi
+        dim h=jiekou(ajsjapi,act)
+        TracePrint h
+    Next
+    // Log.Info("处理并传递案件收结案数据成功")
+End Function
+
+//员额法官名称传输
+function postAnJianSJLawyername(data,ip)
+    // dim ip="http://132.40.22.6"
+    dim nameapi=ip&"/index.php/implement/addlawyer"
+    dim act={}
+    For Each v In data
+        // TracePrint v
+        if v[3]<>"" or v[3]<>" "
+            act={'lawyername':v[3]}
+            File.Append("C:\\Users\\tpwy\\Desktop\\法官姓名.txt",JSON.Stringify(act),"gbk")
+            // TracePrint act
+            dim h=jiekou(nameapi,act)
+            TracePrint h
+        end if 
+    Next
+    // Log.Info("处理并传递案件收结案成功")
+
+end function
+
+/*
+*获取已经整理好的月度统计数据，逐条传递数据
+*@param：data
+*return：status
+*/
+Function PostMonthData(data,ip)
+    // dim ip="http://132.40.22.6"
+    dim actdic={}
+    //获取当前日期
+    Log.Info("开始处理并传递-月度统计--数据")
+    Dialog.Notify("开始处理并传递月度统计数据", "UiBot", "0")
+    dim enddate = Time.Format(Time.Date(),"yyyymmdd")
+    dim startdate = SubStr(enddate,1,4)&"0101"
+    dim ydtjapi=ip&"/index.php/implement/addmonth"
+    For Each k In data
+        //statusid：0生成的一级标题(状态大标题),departmentid：1生成的二级标题(庭室名称，下拉框),mold：2本月旧存,mnew：3本月新收,mend：5本月已结案,ming：15本月总未结,mingofold：16本月未结中往年旧存,mingofnew：17本月未结中今年新收，mperofend：6本月结案率，mlastmperofend：7本月 去年同月结案率%，yold：8去年旧存，ynew:9本年新收,yend:10本年已结,yendofold:11本年已结中旧存,yendofnew:12本年已结中新收,	yperofend:13本年结案率,ylastmperofend:14本年 去年同月结案率%,mark:表中最后一句话18,统计开始时间，统计当前时间
+        actdic={'statusid':repZero(k[0]),'departmentid':repZero(k[1]),'mold':repZero(k[2]),"mnew":repZero(k[3]),'mend':repZero(k[5]),'ming':repZero(k[15]),'mingofold':repZero(k[16]),'mingofnew':repZero(k[17]),'mperofend':repZero(k[6]),'mlastmperofend':repZero(k[7]),'yold':repZero(k[8]),'ynew':repZero(k[9]),'yend':repZero(k[10]),'yendofold':repZero(k[11]),'yendofnew':repZero(k[12]),'yperofend':repZero(k[13]),'ylastmperofend':repZero(k[14]),'mark':repZero(k[18]),'startdate':startdate,'enddate':enddate}
+        // TracePrint actdic
+        dim h
+        h=jiekou(ydtjapi,actdic)
+        TracePrint h
+        // File.Append("C:\\Users\\tpwy\\Desktop\\月度统计测试.txt",JSON.Stringify(actdic),"gbk")
+    Next
+    // Log.Info("处理并传递月度统计数据成功")
+    Dialog.Notify("处理并传递月度统计数据成功", "UiBot", "0")
+End Function
+
+
+//将json数据传入接口
+function jiekou(api,act)
+    Return HTTP.PostJson(api,act, 60000)
+end function
+
+// TracePrint HTTP.PostJson("http://132.40.17.181/index.php/implement/addmonth",{'test':1}, 60000)
+
+// dim ydtjapi="http://132.40.17.181/index.php/implement/addmonth"
+// dim yuedutongji={'statusid':'执行','departmentid':'执行局','mold':122,"mnew":100,'mend':10,'ming':10,'mingofold':20,'mingofnew':11,'mperofend':5.54,'mlastmperofend':2.56,'yold':122,'ynew':52,'yend':85,'yendofold':52,'yendofnew':96,'yperofend':99.32,'ylastmperofend':85.65,'mark':"或人工费",'startdate':20200101,'enddate':20201010}
+// dim h= jiekou(ydtjapi,yuedutongji)
+// TracePrint h
+
+// dim zxapi="http://132.40.17.183/index.php/implement/addeffect"
+// dim zxkh={'sortid':'一级表头','standardid':'二级表头','courtid':'法院名称','number':2020,'startdate':20200101,'enddate':20200110}
+// dim h=jiekou(zxapi,zxkh)
+// TracePrint h
+
+
+// dim zhapi="http://132.40.17.183/index.php/implement/Addmultiple"
+// dim zhgl={'sortid':'一级表头','standardid':'二级表头','courtid':'法院名称','number':2020,'startdate':20200101,'enddate':20200110}
+// dim h=jiekou(zhapi,zhgl)
+// TracePrint h
+
+
+
+
+
+// dim hzapi="http://132.40.17.183/index.php/implement/addbase"
+// //案件类型,案件数,新收,旧存,已结,未结,已结到位金额,统计开始时间,统计当前时间
+// dim hzzs={'sortid':'案件类型','eventnum':7777,'new':5645,'old':545,'end':5453,'ing':4565,'money':5452.65,'startdate':20200101,'enddate':20200110}
+// dim h= jiekou(hzapi,hzzs)
+// TracePrint h
+
+
+// dim act={'lawyerid':"张朝青",'event':"(2014)尧执字第00112号",'statusid':"执行",'aliasid':"执",'endmethodid':"执行终结 ",'enddate':20201001,'mark':0}
+// dim yueduapi="http://132.40.17.183/index.php/implement/addevent"
+// dim x=jiekou(yueduapi,act)
+// TracePrint x
+
+
+// function PostHXZBData(table,tw,th,tt,startrow,startcol,date)
+//     table=fixFormTablehead(table,tw,th,tt)
+//     dim actdic={}
+//     TracePrint "开始处理并传递核心指标数据"
+//     Log.Info("开始处理并传递核心指标数据")
+//     Dialog.Notify("开始处理并传递核心指标数据", "UiBot", "0")
+//     For i=startrow-1 to th-1
+//         for j=startcol-1 to tw-1
+//             //获取当前日期
+//             // dim enddate = Time.Format(Time.Date(),"yyyymmdd")
+//             // dim startdate= SubStr(enddate,1,4)&"0101"
+//             // dim x={'sortid':'一级表头','courtid':'法院名称','number':2015，'date'：2021-k}
+//             actdic={'sortid':DelLinefeed(table[0][j]),'courtid':table[i][1],'number':replZero(table[i][j]),'date':date}
+//             TracePrint actdic
+//             File.Append("C:\\Users\\tpwy\\Desktop\\核心指标1.txt",JSON.Stringify(actdic),"gbk")
+//             // dim h=jiekou(api,actdic)
+//             // push(arrData,arrayData)
+//             // TracePrint(h)
+//         next
+//     Next
+//     TracePrint "处理并传递核心指标数据成功"
+//     Log.Info("处理并传递核心指标数据成功")
+//     Dialog.Notify("处理并传递核心指标数据成功", "UiBot", "0")
+// end function
+
+
+// dim url="http://132.40.17.183/index.php/implement/addmultiple/getcache"
+// iswrite(url)
+// Function iswrite(url)
+//     dim me=HTTP.Get(url, {}, 60000)
+//     dim objJSON = JSON.Parse(me)
+//     if objJSON['code']=1
+//         // 抓取并写入数据库
+//         TracePrint "成功写入"
+//         //成功写入
+//         return 1
+//     else
+//         TracePrint "暂时不能写入"
+//         //暂时不能写入
+//         return 0
+//     end if
+// End Function
+

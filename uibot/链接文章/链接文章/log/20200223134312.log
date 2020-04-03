@@ -1,0 +1,4 @@
+[2020/2/23 13:43:27][ERROR][uibot382ed9af664c14.task][107] 运行发生错误，流程中止
+错误信息如下：
+uibot382ed9af664c14.task 第107行：模块调用出错：调用的目标发生了异常。
+download file error: not support protocol data

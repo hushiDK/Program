@@ -1,0 +1,5 @@
+dim arrElement = ""
+#icon("@res:umig9ddj-k85s-12e0-i2qi-soeibhgmht49.png")
+arrElement = UiElement.GetChildren({"wnd":[{"app":"explorer","cls":"WorkerW"},{"cls":"SHELLDLL_DefView"},{"cls":"SysListView32","title":"FolderView","ctrlid":1}]},{"bContinueOnError":false,"iDelayAfter":300,"iDelayBefore":200})
+
+

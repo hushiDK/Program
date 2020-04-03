@@ -1,0 +1,20 @@
+[2020/3/24 20:57:48][INFO][uibot59b66fabdbcb7.task][15] 2020-03-24 20:57:48--读取配置信息--完毕
+[2020/3/24 20:58:00][INFO][uibot3811e3e9a89eb6.task][169] 当前月份-2020-03
+[2020/3/24 20:58:05][INFO][uibot59b66fabdbcb7.task][50] 200
+[2020/3/24 20:58:20][INFO][uibot59b66fabdbcb7.task][79] 200
+[2020/3/24 20:58:21][INFO][uibot59b66fabdbcb7.task][98] 2020-03-24 20:58:21--执行流程--登录成功
+[2020/3/24 20:58:29][INFO][uibot59b66fabdbcb7.task][415] 2020-03-24 20:58:29抓取-2020-03-月度统计表头--数据
+[2020/3/24 20:58:29][INFO][uibot59b66fabdbcb7.task][421] 抓取-2020-03-月度表头数据--成功
+[2020/3/24 20:58:40][INFO][uibot59b66fabdbcb7.task][435] 抓取-2020-03-月度下拉数据--成功
+[2020/3/24 20:58:40][INFO][uibot59b66fabdbcb7.task][870] http://132.40.22.6/index.php/implement/addmonth/getcache
+[2020/3/24 20:58:40][INFO][uibot59b66fabdbcb7.task][873] ﻿1
+[2020/3/24 20:58:40][INFO][uibot59b66fabdbcb7.task][874] string
+[2020/3/24 20:58:40][INFO][uibot59b66fabdbcb7.task][876] 0
+[2020/3/24 20:58:40][INFO][uibot59b66fabdbcb7.task][870] http://132.40.22.6/index.php/implement/addmonth/getcache
+[2020/3/24 20:58:40][INFO][uibot59b66fabdbcb7.task][873] ﻿1
+[2020/3/24 20:58:40][INFO][uibot59b66fabdbcb7.task][874] string
+[2020/3/24 20:58:40][INFO][uibot59b66fabdbcb7.task][876] 0
+[2020/3/24 20:58:40][INFO][uibot59b66fabdbcb7.task][453] 请求数据库失败，执行下一步
+[2020/3/24 20:58:40][INFO][uibot38128a1d5acc80.task][59] 2020-03-24 20:58:40--执行流程--月度统计表数据传递完毕
+[2020/3/24 20:58:40][INFO][uibot38128a1d5acc80.task][63] --执行流程--运行完美落幕~
+[2020/3/24 20:58:45][INFO][][0] 运行已结束
